@@ -1,19 +1,14 @@
 import { CachedInput, CachedInputNumber } from '@/components/cached_text_area';
 import { CachedRadioGroup } from '@/components/radio_picker';
-import { makeBuildShell } from '@/utils/autotools';
+import {
+  abiList,
+  buildPlatformList,
+  libTypeList,
+  makeBuildShell,
+} from '@/utils/autotools';
 import { useSafeState } from 'ahooks';
 import { Space } from 'antd';
 import { CodeBlock } from '@atlaskit/code';
-const abiList = [
-  'aarch64-linux-android',
-  'armv7a-linux-androideabi',
-  'i686-linux-android',
-  'x86_64-linux-android',
-];
-
-const buildPlatformList: string[] = ['macOS', 'linux', 'windows'];
-
-const libTypeList = ['shared', 'static'];
 
 export default function AndroidPart() {
   const [ndkPath, setNdkPath] = useSafeState<string>('');

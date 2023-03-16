@@ -1,4 +1,14 @@
 import { join } from './strings';
+export const abiList = [
+  'aarch64-linux-android',
+  'armv7a-linux-androideabi',
+  'i686-linux-android',
+  'x86_64-linux-android',
+];
+
+export const buildPlatformList: string[] = ['macOS', 'linux', 'windows'];
+
+export const libTypeList = ['shared', 'static'];
 
 interface AutotoolsBuildOptions {
   ndkPath: string;
@@ -23,6 +33,25 @@ function convertBuildPlatform(platform: string): string {
   } else {
     return '';
   }
+}
+
+function convertAndroidAbi(abi: string): string {
+  if (abi === 'aarch64-linux-android') {
+    return 'arm64-v8a';
+  } else if (abi === 'armv7a-linux-androideabi') {
+    return 'armeabi-v7a';
+  } else if (abi === 'i686-linux-android') {
+    return 'x86';
+  } else if (abi === 'x86_64-linux-android') {
+    return 'x86_64';
+  }
+
+  return '';
+}
+
+function convertAndroidPrefix(prefix: string, targetAbi: string): string {
+  let installPrefix = prefix || join('$HOME', 'libs', 'android');
+  return join(installPrefix, convertAndroidAbi(targetAbi));
 }
 
 export function makeBuildShell(options: AutotoolsBuildOptions): string {
@@ -68,7 +97,10 @@ export LD=${ld}
 export RANLIB=${ranlib}
 export STRIP=${strip}
 
-./configure --host ${targetAbi} --prefix=${options.prefix} ${flags}
+./configure --host ${targetAbi} --prefix=${convertAndroidPrefix(
+    options.prefix,
+    targetAbi,
+  )} ${flags}
 make -j${processCount}
 make install
     `.trim();
