@@ -81,6 +81,7 @@ export default function AndroidPart() {
       />
       <CachedInput
         title="other flags"
+        htmlSize={120}
         cachedKey={'android-flags'}
         placeholder={
           'The flags are used to pass to the configure script. For example, --enable-static --disable-shared'
