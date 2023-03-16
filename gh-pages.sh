@@ -24,6 +24,9 @@ git init
 git checkout --orphan gh-pages
 git remote add origin $MY_GIT_URL
 
+git config user.email cjl_spy@163.com
+git config user.name CaiJingLong
+
 git add .
 git commit -m "update gh-pages"
 git push origin gh-pages --force
