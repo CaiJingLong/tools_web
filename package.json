@@ -2,12 +2,12 @@
   "private": true,
   "author": "CaiJingLong <cjl_spy@163.com>",
   "scripts": {
-    "dev": "max dev",
     "build": "max build",
+    "dev": "max dev",
     "dist": "pnpm build",
     "format": "prettier --cache --write .",
-    "prepare": "husky install",
     "postinstall": "max setup",
+    "prepare": "husky install",
     "setup": "max setup",
     "start": "npm run dev"
   },
