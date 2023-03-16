@@ -10,21 +10,19 @@ export work_dir=$(pwd)
 export dist_dir=$work_dir/dist
 
 cd /tmp
-git clone $MY_GIT_URL gh-pages
+if [ -d "gh-pages" ]; then
+    rm -rf gh-pages
+fi
+mkdir gh-pages
+
 cd gh-pages
-git checkout gh-pages
-
-rm -rf *.js
-rm -rf *.css
-rm -rf *.map
-rm -rf *.html
-
-rm **/*.js
-rm **/*.css
-rm **/*.map
-rm **/*.html
 
 cp -r $dist_dir/* .
+
+git init
+
+git checkout --orphan gh-pages
+git origin add origin $MY_GIT_URL
 
 git add .
 git commit -m "update gh-pages"
