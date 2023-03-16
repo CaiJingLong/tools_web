@@ -56,7 +56,9 @@ export function CachedInput(props: CachedInputProps) {
     defaultValue: '',
   });
 
-  useMount(() => {});
+  useMount(() => {
+    onTextChanged(value);
+  });
 
   return (
     <Space direction="vertical">

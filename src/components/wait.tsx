@@ -1,15 +1,16 @@
-import { Spin } from 'antd';
+import { Space, Spin } from 'antd';
 import styles from './wait.less';
 interface Props {
   name: string;
 }
 
-export default function Wait(props: Props) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function Wait(_props: Props) {
   return (
-    <div className={styles.wait}>
-      {props.name} 还没完工
-      <Spin></Spin>
-    </div>
+    <Space className={styles.wait} direction="vertical">
+      Coming soon...
+      <Spin size="large" />
+    </Space>
   );
 }
 

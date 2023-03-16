@@ -7,10 +7,24 @@ import {
   makeBuildShell,
 } from '@/utils/autotools';
 import { useSafeState } from 'ahooks';
-import { Space } from 'antd';
+import { Button, Modal, Space } from 'antd';
 import { CodeBlock } from '@atlaskit/code';
+import copy from 'copy-to-clipboard';
+import { flags } from '@/configs';
 
-export default function AndroidPart() {
+function pickFlags() {
+  for (const flag of flags.flags) {
+    console.log(flag);
+  }
+
+  Modal.info({
+    title: 'Pick flags',
+    maskClosable: true,
+    content: <div>Coming soon</div>,
+  });
+}
+
+function AndroidPart() {
   const [ndkPath, setNdkPath] = useSafeState<string>('');
   const [abi, setAbi] = useSafeState<string>('');
   const [buildPlatform, setBuildPlatform] = useSafeState<string>('');
@@ -79,6 +93,7 @@ export default function AndroidPart() {
         }
         checkEmpty
       />
+      <Button onClick={pickFlags}>Show Flags</Button>
       <CachedInput
         title="other flags"
         htmlSize={120}
@@ -89,6 +104,15 @@ export default function AndroidPart() {
         onValueChanged={setFlags}
       />
       <CodeBlock text={shell} language="shell" />
+      <Button
+        onClick={() => {
+          copy(shell);
+        }}
+      >
+        Copy
+      </Button>
     </Space>
   );
 }
+
+export default AndroidPart;
