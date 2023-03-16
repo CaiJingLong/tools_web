@@ -22,7 +22,7 @@ cp -r $dist_dir/* .
 git init
 
 git checkout --orphan gh-pages
-git origin add origin $MY_GIT_URL
+git remote add origin $MY_GIT_URL
 
 git add .
 git commit -m "update gh-pages"
