@@ -53,7 +53,8 @@ function AndroidPart() {
         onValueChanged={setNdkPath}
         title={'NDK Path'}
         placeholder={'The path to the NDK. The support version is 25'}
-        checkEmpty
+        emptytooltip={'The NDK path is empty.'}
+        defaultValue={'$ANDORID_NDK'}
       />
       <CachedRadioGroup
         title={'ABI'}
@@ -82,6 +83,7 @@ function AndroidPart() {
         onValueChanged={(n) => {
           setApiLevel(n as number);
         }}
+        defaultValue={21}
       />
       <CachedInput
         cachedKey={'android-prefix'}
@@ -91,7 +93,8 @@ function AndroidPart() {
         placeholder={
           'The prefix is used to install the built files. Recommended to use the absolute path.'
         }
-        checkEmpty
+        emptytooltip={'The prefix is empty.'}
+        defaultValue={'$HOME/android-libs'}
       />
       <Button onClick={pickFlags}>Show Flags</Button>
       <CachedInput

@@ -5,13 +5,21 @@ import { InputProps } from 'antd/lib/input';
 
 interface Props<T> {
   cachedKey: string;
-  checkEmpty?: boolean;
+  emptytooltip?: string;
   onValueChanged: (e: T) => void;
 }
 
-type CachedTextAreaProps = Props<string> & TextAreaProps;
-type CachedInputProps = Props<string> & InputProps;
-type CachedInputNumberProps = Props<number> & InputNumberProps;
+interface DefaultValueProps<T> {
+  defaultValue?: T;
+}
+
+type CachedTextAreaProps = Props<string> &
+  TextAreaProps &
+  DefaultValueProps<string>;
+type CachedInputProps = Props<string> & InputProps & DefaultValueProps<string>;
+type CachedInputNumberProps = Props<number> &
+  InputNumberProps &
+  DefaultValueProps<number>;
 
 export function CachedTextArea(props: CachedTextAreaProps) {
   const {
@@ -22,7 +30,7 @@ export function CachedTextArea(props: CachedTextAreaProps) {
   } = props;
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
-    defaultValue: '',
+    defaultValue: props.defaultValue || '',
   });
 
   useMount(() => {});
@@ -32,7 +40,7 @@ export function CachedTextArea(props: CachedTextAreaProps) {
       {title}
       <Input.TextArea
         {...restProps}
-        status={props.checkEmpty && value === '' ? 'warning' : undefined}
+        status={props.emptytooltip && value === '' ? 'warning' : undefined}
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
@@ -53,7 +61,7 @@ export function CachedInput(props: CachedInputProps) {
   } = props;
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
-    defaultValue: '',
+    defaultValue: props.defaultValue || '',
   });
 
   useMount(() => {
@@ -65,7 +73,7 @@ export function CachedInput(props: CachedInputProps) {
       {title}
       <Input
         {...restProps}
-        status={props.checkEmpty && value === '' ? 'warning' : undefined}
+        status={props.emptytooltip && value === '' ? 'warning' : undefined}
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
@@ -86,10 +94,12 @@ export function CachedInputNumber(props: CachedInputNumberProps) {
   } = props;
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
-    defaultValue: 0,
+    defaultValue: props.defaultValue || 0,
   });
 
-  useMount(() => {});
+  useMount(() => {
+    onTextChanged(value);
+  });
 
   return (
     <Space direction="vertical">
