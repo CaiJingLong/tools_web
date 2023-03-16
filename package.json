@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "max dev",
     "build": "max build",
+    "dist": "pnpm build",
     "format": "prettier --cache --write .",
     "prepare": "husky install",
     "postinstall": "max setup",

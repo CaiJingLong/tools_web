@@ -4,7 +4,7 @@
 export MY_GIT_URL=https://github.com/CaiJingLong/tools_web.git
 
 pnpm install
-pnpm run dist
+pnpm run build
 
 export work_dir=$(pwd)
 export dist_dir=$work_dir/dist
