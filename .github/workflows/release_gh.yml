@@ -40,3 +40,9 @@ jobs:
       - name: Release gh-pages
         shell: bash
         run: ./gh-pages.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      deployments: write
+      contents: write
+      packages: read

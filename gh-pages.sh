@@ -24,8 +24,12 @@ git init
 git checkout --orphan gh-pages
 git remote add origin $MY_GIT_URL
 
+token=$GITHUB_TOKEN
+echo "${token}" | gh auth login --with-token --hostname github.com -p https
+gh auth setup-git -h github.com
+
+git config user.name "CaiJingLong"
 git config user.email cjl_spy@163.com
-git config user.name CaiJingLong
 
 git add .
 git commit -m "update gh-pages"
