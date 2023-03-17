@@ -60,9 +60,9 @@ export function makeBuildShell(options: AutotoolsBuildOptions): string {
   let { processCount, shell, flags } = options;
 
   if (libType === 'static') {
-    flags += ' --enable-static --disable-shared';
+    flags = `--enable-static --disable-shared ${flags}`;
   } else {
-    flags += ' --enable-shared --disable-static';
+    flags = `--enable-shared --disable-static ${flags}`;
   }
 
   processCount = processCount || 6;
@@ -76,19 +76,24 @@ export function makeBuildShell(options: AutotoolsBuildOptions): string {
     convertBuildPlatform(buildPlatform),
   );
 
-  const bins = join(toolchains, 'bin');
+  const bin = join('$TOOLCHAINS', 'bin');
+  const bins = '$BINS';
 
   const cc = `${join(bins, targetAbi)}${apiLevel}-clang`;
   const cxx = `${join(bins, targetAbi)}${apiLevel}-clang++`;
   const ar = join(bins, 'llvm-ar');
-  const as = cc;
+  const as = '$CC';
   const ld = join(bins, 'ld');
   const ranlib = join(bins, 'llvm-ranlib');
   const strip = join(bins, 'llvm-strip');
 
+  const prefix = convertAndroidPrefix(options.prefix, targetAbi);
+
   return `
 #!/bin/${shell}
 export NDK=${ndkPath}
+export TOOLCHAINS=${toolchains}
+export BINS=${bin}
 export CC=${cc}
 export CXX=${cxx}
 export AR=${ar}
@@ -97,10 +102,7 @@ export LD=${ld}
 export RANLIB=${ranlib}
 export STRIP=${strip}
 
-./configure --host ${targetAbi} --prefix=${convertAndroidPrefix(
-    options.prefix,
-    targetAbi,
-  )} ${flags}
+./configure --host ${targetAbi} --prefix=${prefix} ${flags}
 make -j${processCount}
 make install
     `.trim();
