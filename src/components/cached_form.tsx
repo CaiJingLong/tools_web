@@ -1,5 +1,6 @@
 import { useSafeState } from 'ahooks';
 import { Space } from 'antd';
+import { useEffect } from 'react';
 import {
   CachedInput,
   CachedInputNumber,
@@ -98,16 +99,26 @@ export default function CachedForm(props: CachedFormProps) {
     [key: string]: string | number | undefined;
   } = {};
 
+  for (let item of items) {
+    initData[item.cachedKey] =
+      localStorage.getItem(item.cachedKey) ?? item.defaultValue;
+  }
+
   const [data, setData] = useSafeState(initData);
+
+  useEffect(() => {
+    props.onDataChanged?.(data);
+    return () => {};
+  }, [data]);
 
   for (let item of items) {
     widgets.push(
       <MakerItem
         item={item}
+        key={item.cachedKey}
         onValueChanged={(v) => {
           const newData = { ...data, [item.cachedKey]: v };
           setData(newData);
-          props.onDataChanged?.(newData);
         }}
       />,
     );

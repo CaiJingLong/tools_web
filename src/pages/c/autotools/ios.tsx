@@ -1,4 +1,4 @@
-import CachedForm, { CacheFormItemProps } from '@/components/cached_tsx';
+import CachedForm, { CacheFormItemProps } from '@/components/cached_form';
 import { libTypeList } from '@/utils/autotools';
 
 export default function AutoToolIOS() {

@@ -33,7 +33,9 @@ export function CachedTextArea(props: CachedTextAreaProps) {
     defaultValue: props.defaultValue || '',
   });
 
-  useMount(() => {});
+  useMount(() => {
+    onTextChanged(value);
+  });
 
   return (
     <Space direction="vertical">
@@ -65,6 +67,7 @@ export function CachedInput(props: CachedInputProps) {
   });
 
   useMount(() => {
+    setValue(value);
     onTextChanged(value);
   });
 
@@ -98,6 +101,7 @@ export function CachedInputNumber(props: CachedInputNumberProps) {
   });
 
   useMount(() => {
+    setValue(value);
     onTextChanged(value);
   });
 

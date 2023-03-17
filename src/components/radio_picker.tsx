@@ -25,6 +25,7 @@ export function CachedRadioGroup(props: CachedRadioGroupProps) {
 
   useMount(() => {
     if (onChange) {
+      setValue(value);
       onChange(value);
     }
   });
