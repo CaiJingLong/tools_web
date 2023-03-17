@@ -10,6 +10,7 @@ import { useSafeState } from 'ahooks';
 import { Button, Modal, Space } from 'antd';
 import { CodeBlock } from '@atlaskit/code';
 import copy from 'copy-to-clipboard';
+import { clickButtonToDownloadBlobText } from '@/utils/download';
 import { flags } from '@/configs';
 
 function pickFlags() {
@@ -107,13 +108,22 @@ function AndroidPart() {
         onValueChanged={setFlags}
       />
       <CodeBlock text={shell} language="shell" />
-      <Button
-        onClick={() => {
-          copy(shell);
-        }}
-      >
-        Copy
-      </Button>
+      <Space>
+        <Button
+          onClick={() => {
+            copy(shell);
+          }}
+        >
+          Copy
+        </Button>
+        <Button
+          onClick={() =>
+            clickButtonToDownloadBlobText(shell, `autotool-build-${abi}.sh`)
+          }
+        >
+          Download
+        </Button>
+      </Space>
     </Space>
   );
 }
