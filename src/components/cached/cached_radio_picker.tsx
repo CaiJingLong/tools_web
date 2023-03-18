@@ -3,9 +3,9 @@ import { Radio, RadioGroupProps, Space } from 'antd';
 
 interface Props {
   title: string;
-  values: string[];
+  allOptions: string[];
   localStoreKey: string;
-  onValueChanged?: (value: string) => void;
+  onOptionChanged?: (value: string) => void;
 }
 
 type CachedRadioGroupProps = Props & RadioGroupProps;
@@ -13,9 +13,9 @@ type CachedRadioGroupProps = Props & RadioGroupProps;
 export function CachedRadioGroup(props: CachedRadioGroupProps) {
   const {
     title,
-    values: radioValues,
+    allOptions: radioValues,
     localStoreKey,
-    onValueChanged: onChange,
+    onOptionChanged: onChange,
     ...origin
   } = props;
 

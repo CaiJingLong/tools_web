@@ -2,8 +2,8 @@ import React from 'react';
 import { useSafeState } from 'ahooks';
 import { Space } from 'antd';
 import AndroidPart from './android';
-import { CachedRadioGroup } from '@/components/radio_picker';
 import AutoToolIOS from './ios';
+import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
 
 const types = ['android', 'iOS'];
 type AutoToolType = (typeof types)[number];
@@ -25,9 +25,9 @@ export default function Page() {
     <Space direction="vertical">
       <CachedRadioGroup
         title={'Platform'}
-        values={types}
+        allOptions={types}
         localStoreKey={localStoreKey}
-        onValueChanged={setType}
+        onOptionChanged={setType}
       />
       {widget}
     </Space>

@@ -1,19 +1,16 @@
 import { useSafeState } from 'ahooks';
 import { Space } from 'antd';
 import { useEffect } from 'react';
-import {
-  CachedInput,
-  CachedInputNumber,
-  CachedTextArea,
-} from './cached_text_area';
-import { CachedRadioGroup } from './radio_picker';
+import { CachedCheckboxGroup } from './cached_checkbox';
+import { CachedInput, CachedInputNumber, CachedTextArea } from './cached_input';
+import { CachedRadioGroup } from './cached_radio_picker';
 
 export interface CacheFormItemProps {
-  type: 'input' | 'textArea' | 'inputNumber' | 'radioGroup';
+  type: 'input' | 'textArea' | 'inputNumber' | 'radioGroup' | 'checkboxGroup';
   cachedKey: string;
   title: string;
   defaultValue?: string | number;
-  values?: string[];
+  options?: string[];
   min?: number;
   max?: number;
 }
@@ -21,19 +18,19 @@ export interface CacheFormItemProps {
 export interface CachedFormProps {
   items: CacheFormItemProps[];
   onDataChanged?: (data: {
-    [key: string]: string | number | undefined;
+    [key: string]: string | number | string[] | undefined;
   }) => void;
 }
 
-function MakerItem(props: {
+function CachedFormItem(props: {
   item: CacheFormItemProps;
-  onValueChanged?: (v: string | number) => void;
+  onValueChanged?: (v: string | number | string[]) => void;
 }) {
-  const { type, cachedKey, title, defaultValue, values } = props.item;
+  const { type, cachedKey, title, defaultValue, options: values } = props.item;
   const { onValueChanged: propValueChanged } = props;
-  const [value, setValue] = useSafeState<string | number | undefined>(
-    defaultValue,
-  );
+  const [value, setValue] = useSafeState<
+    string | number | string[] | undefined
+  >(defaultValue);
 
   const onValueChanged = (v: string) => {
     setValue(v);
@@ -41,6 +38,11 @@ function MakerItem(props: {
   };
 
   const onNumberValueChanged = (v: number) => {
+    setValue(v);
+    propValueChanged?.(v);
+  };
+
+  const onCheckboxValueChanged = (v: string[]) => {
     setValue(v);
     propValueChanged?.(v);
   };
@@ -81,9 +83,18 @@ function MakerItem(props: {
       return (
         <CachedRadioGroup
           title={title}
-          values={values!}
+          allOptions={values!}
           localStoreKey={cachedKey}
-          onValueChanged={onValueChanged}
+          onOptionChanged={onValueChanged}
+        />
+      );
+    case 'checkboxGroup':
+      return (
+        <CachedCheckboxGroup
+          title={title}
+          allOptions={values!}
+          localStoreKey={cachedKey}
+          onOptionChanged={onCheckboxValueChanged}
         />
       );
     default:
@@ -96,7 +107,7 @@ export default function CachedForm(props: CachedFormProps) {
   let widgets: JSX.Element[] = [];
 
   const initData: {
-    [key: string]: string | number | undefined;
+    [key: string]: string | number | string[] | undefined;
   } = {};
 
   for (let item of items) {
@@ -113,7 +124,7 @@ export default function CachedForm(props: CachedFormProps) {
 
   for (let item of items) {
     widgets.push(
-      <MakerItem
+      <CachedFormItem
         item={item}
         key={item.cachedKey}
         onValueChanged={(v) => {

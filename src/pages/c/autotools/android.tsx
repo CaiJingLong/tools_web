@@ -1,5 +1,3 @@
-import { CachedInput, CachedInputNumber } from '@/components/cached_text_area';
-import { CachedRadioGroup } from '@/components/radio_picker';
 import {
   abiList,
   buildPlatformList,
@@ -12,6 +10,11 @@ import { CodeBlock } from '@atlaskit/code';
 import copy from 'copy-to-clipboard';
 import { clickButtonToDownloadBlobText } from '@/utils/download';
 import { flags } from '@/configs';
+import {
+  CachedInput,
+  CachedInputNumber,
+} from '@/components/cached/cached_input';
+import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
 
 function pickFlags() {
   for (const flag of flags.flags) {
@@ -59,21 +62,21 @@ function AndroidPart() {
       />
       <CachedRadioGroup
         title={'ABI'}
-        values={abiList}
+        allOptions={abiList}
         localStoreKey={'android-abi'}
-        onValueChanged={setAbi}
+        onOptionChanged={setAbi}
       />
       <CachedRadioGroup
         title={'Build Platform'}
-        values={buildPlatformList}
+        allOptions={buildPlatformList}
         localStoreKey={'android-build-platform'}
-        onValueChanged={setBuildPlatform}
+        onOptionChanged={setBuildPlatform}
       />
       <CachedRadioGroup
         title={'Lib Type'}
-        values={libTypeList}
+        allOptions={libTypeList}
         localStoreKey={'android-lib-type'}
-        onValueChanged={setLibType}
+        onOptionChanged={setLibType}
       />
       <CachedInputNumber
         title={'API Level'}

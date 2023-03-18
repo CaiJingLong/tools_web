@@ -1,4 +1,6 @@
-import CachedForm, { CacheFormItemProps } from '@/components/cached_form';
+import CachedForm, {
+  CacheFormItemProps,
+} from '@/components/cached/cached_form';
 import { libTypeList } from '@/utils/autotools';
 
 export default function AutoToolIOS() {
@@ -12,15 +14,15 @@ export default function AutoToolIOS() {
     {
       cachedKey: 'target-abi',
       title: 'Target ABI',
-      type: 'radioGroup',
-      values: ['arm64', 'armv7', 'armv7s', 'arm64e', 'armv7k'],
+      type: 'checkboxGroup',
+      options: ['arm64', 'armv7', 'armv7s', 'arm64e', 'armv7k'],
       defaultValue: 'arm64',
     },
     {
       cachedKey: 'ios-lib-type',
       title: 'Lib type',
       type: 'radioGroup',
-      values: libTypeList,
+      options: libTypeList,
     },
     {
       cachedKey: 'prefix',
