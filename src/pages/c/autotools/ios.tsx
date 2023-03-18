@@ -17,7 +17,7 @@ export default function AutoToolIOS() {
       defaultValue: '/Applications/Xcode.app',
     },
     {
-      cachedKey: 'target-abi',
+      cachedKey: 'ios-target-abi',
       title: 'Target ABI',
       type: 'checkboxGroup',
       options: ['arm64', 'armv7', 'armv7s', 'arm64e', 'armv7k'],
