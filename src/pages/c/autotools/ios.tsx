@@ -1,3 +1,4 @@
+import Building from '@/components/building';
 import CachedForm, {
   CachedFormData,
   CacheFormItemProps,
@@ -5,7 +6,7 @@ import CachedForm, {
 import CodeWidget from '@/components/code_widget';
 import ColSpace from '@/components/col';
 import { libTypeList } from '@/utils/autotools';
-import { inlineText } from '@/utils/strings';
+import { formatConfigurations } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
 
 export default function AutoToolIOS() {
@@ -20,8 +21,8 @@ export default function AutoToolIOS() {
       cachedKey: 'ios-target-abi',
       title: 'Target ABI',
       type: 'checkboxGroup',
-      options: ['arm64', 'armv7', 'armv7s', 'arm64e', 'armv7k'],
-      defaultValue: ['arm64'],
+      options: ['arm64', 'arm64e', 'x86_64'],
+      defaultValue: ['arm64', 'arm64e', 'x86_64'],
     },
     {
       cachedKey: 'ios-lib-type',
@@ -45,9 +46,9 @@ export default function AutoToolIOS() {
   const [data, setData] = useSafeState<CachedFormData>({});
 
   const xcodePath = data['xcode-path'] as string;
-  const targetAbi = data['target-abi'] as string[];
+  const targetAbi = data['ios-target-abi'] as string[];
   const iosLibType = data['ios-lib-type'] as string;
-  const prefix = data['prefix'] as string;
+  const prefix = data['ios-prefix'] as string;
   const iosCflags = data['ios-cflags'] as string;
 
   console.log('xcodePath', xcodePath);
@@ -58,33 +59,35 @@ export default function AutoToolIOS() {
 
   let shell: string;
 
-  if (xcodePath && targetAbi && iosLibType && prefix && iosCflags) {
+  if (xcodePath && targetAbi && iosLibType && prefix) {
     const libTypeFlag =
       iosLibType === 'shared'
         ? '--enable-shared --disable-static'
         : '--disable-shared --enable-static';
 
-    let ldFlags = `-isysroot $XCODE_PATH/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk`;
-    if (targetAbi) {
-      for (const abi of targetAbi) {
-        ldFlags += ` -arch ${abi}`;
-      }
-    }
+    const archs = targetAbi.map((abi) => `-arch ${abi}`).join(' ');
+    const cc = `CC="$BINS/clang ${archs}"`;
+    const cxx = `CXX="$BINS/clang++ ${archs}"`;
+
+    let command = `./configure --prefix=${prefix} ${libTypeFlag} ${iosCflags}`;
+    command = formatConfigurations(command);
+
     shell = `
 #!/bin/bash
 export XCODE_PATH=${xcodePath};
 export BINS=$XCODE_PATH/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-export CC=$BINS/clang
-export CXX=$BINS/clang++
+export ${cc} 
+export ${cxx}
 export LD=$BINS/ld
 export AR=$BINS/ar
 export AS=$BINS/as
 export NM=$BINS/nm
 export RANLIB=$BINS/ranlib
 export STRIP=$BINS/strip
-export LDFLAGS="${ldFlags}"
-export CFLAGS="${inlineText(iosCflags)}"
-./configure --host=arm-apple-darwin --prefix=${prefix} ${libTypeFlag}
+
+${command}
+make -j8
+make install
   `.trim();
   } else {
     shell = '';
@@ -92,6 +95,7 @@ export CFLAGS="${inlineText(iosCflags)}"
 
   return (
     <ColSpace>
+      <Building />
       <CachedForm items={props} onDataChanged={setData} />
       <CodeWidget code={shell} fileName="ios-autotool.sh" language="bash" />
     </ColSpace>

@@ -9,3 +9,9 @@ export function inlineText(text: string): string {
   }
   return result;
 }
+
+export function formatConfigurations(text: string): string {
+  let result = inlineText(text);
+
+  return result.replaceAll(' -', ' \\\n    -');
+}

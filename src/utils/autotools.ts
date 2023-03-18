@@ -69,7 +69,7 @@ export function makeBuildShell(options: AutotoolsBuildOptions): string {
   shell = shell || 'bash';
 
   const toolchains = join(
-    ndkPath,
+    '$NDK_HOME',
     'toolchains',
     'llvm',
     'prebuilt',
@@ -91,7 +91,7 @@ export function makeBuildShell(options: AutotoolsBuildOptions): string {
 
   return `
 #!/bin/${shell}
-export NDK=${ndkPath}
+export NDK_HOME=${ndkPath}
 export TOOLCHAINS=${toolchains}
 export BINS=${bin}
 export CC=${cc}
