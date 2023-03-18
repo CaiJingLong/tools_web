@@ -9,17 +9,19 @@ export interface CacheFormItemProps {
   type: 'input' | 'textArea' | 'inputNumber' | 'radioGroup' | 'checkboxGroup';
   cachedKey: string;
   title: string;
-  defaultValue?: string | number;
+  defaultValue?: string | number | string[];
   options?: string[];
   min?: number;
   max?: number;
 }
 
+export interface CachedFormData {
+  [key: string]: string | number | string[] | undefined;
+}
+
 export interface CachedFormProps {
   items: CacheFormItemProps[];
-  onDataChanged?: (data: {
-    [key: string]: string | number | string[] | undefined;
-  }) => void;
+  onDataChanged?: (data: CachedFormData) => void;
 }
 
 function CachedFormItem(props: {
@@ -28,22 +30,16 @@ function CachedFormItem(props: {
 }) {
   const { type, cachedKey, title, defaultValue, options: values } = props.item;
   const { onValueChanged: propValueChanged } = props;
-  const [value, setValue] = useSafeState<
-    string | number | string[] | undefined
-  >(defaultValue);
 
   const onValueChanged = (v: string) => {
-    setValue(v);
     propValueChanged?.(v);
   };
 
   const onNumberValueChanged = (v: number) => {
-    setValue(v);
     propValueChanged?.(v);
   };
 
   const onCheckboxValueChanged = (v: string[]) => {
-    setValue(v);
     propValueChanged?.(v);
   };
 
@@ -55,7 +51,6 @@ function CachedFormItem(props: {
           onValueChanged={onValueChanged}
           title={title}
           htmlSize={120}
-          value={value}
           defaultValue={defaultValue as string}
         />
       );
@@ -111,9 +106,23 @@ export default function CachedForm(props: CachedFormProps) {
   } = {};
 
   for (let item of items) {
-    initData[item.cachedKey] =
-      localStorage.getItem(item.cachedKey) ?? item.defaultValue;
+    const { cachedKey, defaultValue } = item;
+    let saved = localStorage.getItem(item.cachedKey) ?? '';
+
+    const setItem = (value: string | number | string[] | undefined) => {
+      initData[cachedKey] = value ?? defaultValue;
+    };
+
+    if (item.type === 'inputNumber') {
+      setItem(Number(saved));
+    } else if (item.type === 'checkboxGroup') {
+      setItem(saved.split(','));
+    } else {
+      setItem(saved);
+    }
   }
+
+  console.log('initData', initData);
 
   const [data, setData] = useSafeState(initData);
 

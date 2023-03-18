@@ -21,8 +21,20 @@ export function CachedCheckboxGroup(props: CachedeckboxGroupProps) {
     ...origin
   } = props;
 
-  const [value, setValue] = useLocalStorageState(localStoreKey, {
+  const [value, setValue] = useLocalStorageState<string[]>(localStoreKey, {
     defaultValue: checkboxValues,
+    deserializer: (v) => {
+      if (typeof v === 'string') {
+        return v.split(',');
+      }
+      return v;
+    },
+    serializer: (v) => {
+      if (Array.isArray(v)) {
+        return v.join(',');
+      }
+      return v;
+    },
   });
 
   useMount(() => {

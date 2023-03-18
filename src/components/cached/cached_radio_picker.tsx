@@ -21,6 +21,8 @@ export function CachedRadioGroup(props: CachedRadioGroupProps) {
 
   const [value, setValue] = useLocalStorageState(localStoreKey, {
     defaultValue: radioValues[0],
+    deserializer: (v) => v,
+    serializer: (v) => v,
   });
 
   useMount(() => {

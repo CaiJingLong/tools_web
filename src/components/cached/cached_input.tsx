@@ -31,11 +31,15 @@ export function CachedTextArea(props: CachedTextAreaProps) {
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
     defaultValue: props.defaultValue || '',
+    deserializer: (v) => v,
+    serializer: (v) => v,
   });
 
   useMount(() => {
     onTextChanged(value);
   });
+
+  console.log('text area', value);
 
   return (
     <Space direction="vertical">
@@ -49,6 +53,7 @@ export function CachedTextArea(props: CachedTextAreaProps) {
           onTextChanged(e.target.value);
           restProps.onChange?.(e);
         }}
+        cols={120}
       />
     </Space>
   );
@@ -64,6 +69,8 @@ export function CachedInput(props: CachedInputProps) {
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
     defaultValue: props.defaultValue || '',
+    deserializer: (v) => v,
+    serializer: (v) => v,
   });
 
   useMount(() => {
@@ -98,6 +105,8 @@ export function CachedInputNumber(props: CachedInputNumberProps) {
 
   const [value, setValue] = useLocalStorageState(cachedKey, {
     defaultValue: props.defaultValue || 0,
+    deserializer: (v) => Number(v),
+    serializer: (v) => v.toString(),
   });
 
   useMount(() => {
