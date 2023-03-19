@@ -4,7 +4,7 @@ on:
     types: [published]
   workflow_dispatch:
 jobs:
-  build: # make sure build/ci work properly
+  deploy-github-pages: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
