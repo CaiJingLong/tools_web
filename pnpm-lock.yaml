@@ -4,13 +4,16 @@ specifiers:
   '@ant-design/icons': ^4.7.0
   '@ant-design/pro-components': ^2.0.1
   '@atlaskit/code': ^14.4.8
+  '@types/crypto-js': ^4.1.1
   '@types/react': ^18.0.0
   '@types/react-dom': ^18.0.0
   '@umijs/max': ^4.0.59
   ahooks: ^3.7.5
   antd: ^5.0.0
   copy-to-clipboard: ^3.3.3
+  crypto-js: ^4.1.1
   husky: ^8.0.1
+  js-md5: ^0.7.3
   lint-staged: ^13.0.3
   prettier: ^2.7.1
   prettier-plugin-organize-imports: ^2
@@ -25,8 +28,11 @@ dependencies:
   ahooks: 3.7.5
   antd: 5.3.1
   copy-to-clipboard: 3.3.3
+  crypto-js: 4.1.1
+  js-md5: 0.7.3
 
 devDependencies:
+  '@types/crypto-js': 4.1.1
   '@types/react': 18.0.28
   '@types/react-dom': 18.0.11
   husky: 8.0.3
@@ -3637,6 +3643,10 @@ packages:
       '@babel/types': 7.21.3
     dev: false
 
+  /@types/crypto-js/4.1.1:
+    resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
+    dev: true
+
   /@types/graceful-fs/4.1.6:
     resolution: {integrity: sha512-Sig0SNORX9fdW+bQuTEovKj3uHcUL6LQKbCrrqb1X7J6/ReAbhCXRAhc+SMejhLELFj2QcyuxmUooZ4bt5ReSw==}
     dependencies:
@@ -5427,6 +5437,10 @@ packages:
       public-encrypt: 4.0.3
       randombytes: 2.1.0
       randomfill: 1.0.4
+    dev: false
+
+  /crypto-js/4.1.1:
+    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
     dev: false
 
   /css-blank-pseudo/3.0.3:
@@ -7434,6 +7448,10 @@ packages:
 
   /js-cookie/2.2.1:
     resolution: {integrity: sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==}
+    dev: false
+
+  /js-md5/0.7.3:
+    resolution: {integrity: sha512-ZC41vPSTLKGwIRjqDh8DfXoCrdQIyBgspJVPXHBGu4nZlAEvG3nf+jO9avM9RmLiGakg7vz974ms99nEV0tmTQ==}
     dev: false
 
   /js-sdsl/4.3.0:

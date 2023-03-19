@@ -4,7 +4,7 @@ import { Radio, RadioGroupProps, Space } from 'antd';
 interface Props {
   title: string;
   allOptions: string[];
-  localStoreKey: string;
+  cachedKey: string;
   onOptionChanged?: (value: string) => void;
 }
 
@@ -14,12 +14,12 @@ export function CachedRadioGroup(props: CachedRadioGroupProps) {
   const {
     title,
     allOptions: radioValues,
-    localStoreKey,
+    cachedKey,
     onOptionChanged: onChange,
     ...origin
   } = props;
 
-  const [value, setValue] = useLocalStorageState(localStoreKey, {
+  const [value, setValue] = useLocalStorageState(cachedKey, {
     defaultValue: radioValues[0],
     deserializer: (v) => v,
     serializer: (v) => v,
@@ -53,7 +53,7 @@ export function CachedRadioGroup(props: CachedRadioGroupProps) {
 
 interface BoolProps {
   title: string;
-  localStoreKey: string;
+  cachedKey: string;
   onValueChanged?: (value: boolean) => void;
 }
 
