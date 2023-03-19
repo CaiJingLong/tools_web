@@ -79,7 +79,7 @@ function CachedFormItem(props: {
         <CachedRadioGroup
           title={title}
           allOptions={values!}
-          localStoreKey={cachedKey}
+          cachedKey={cachedKey}
           onOptionChanged={onValueChanged}
         />
       );
