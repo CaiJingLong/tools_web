@@ -10,9 +10,8 @@ import {
   urlEncode,
 } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
-import { Descriptions, Space, Typography } from 'antd';
-
-const { Paragraph } = Typography;
+import { Button, Descriptions, Space, Typography } from 'antd';
+import copy from 'copy-to-clipboard';
 
 const convertMap: {
   [key: string]: {
@@ -45,6 +44,23 @@ const convertMap: {
   },
 };
 
+function DescContent(props: { text: string }) {
+  const { text } = props;
+
+  return (
+    <Space>
+      {text}
+      <Button
+        onClick={() => {
+          copy(text);
+        }}
+      >
+        Copy
+      </Button>
+    </Space>
+  );
+}
+
 function ConvertItem(props: { type: string; text: string }) {
   const { type, text } = props;
 
@@ -53,11 +69,13 @@ function ConvertItem(props: { type: string; text: string }) {
   return (
     <Descriptions title={type} column={1} size="small" bordered>
       <Descriptions.Item label="encode">
-        <Paragraph copyable>{encode(text)}</Paragraph>
+        <DescContent text={encode(text)} />
       </Descriptions.Item>
       {decode && (
         <Descriptions.Item label="decode">
-          <Paragraph copyable>{decode?.(text)}</Paragraph>
+          <Space>
+            <DescContent text={decode(text)} />
+          </Space>
         </Descriptions.Item>
       )}
     </Descriptions>
