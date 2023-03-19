@@ -26,7 +26,7 @@ export default function Page() {
       <CachedRadioGroup
         title={'Platform'}
         allOptions={types}
-        localStoreKey={localStoreKey}
+        cachedKey={localStoreKey}
         onOptionChanged={setType}
       />
       {widget}

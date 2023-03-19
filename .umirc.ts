@@ -30,6 +30,17 @@ export default defineConfig({
         },
       ],
     },
+    {
+      name: 'common',
+      path: '/common',
+      routes: [
+        {
+          name: 'converter',
+          path: 'converter',
+          component: './common/converter',
+        }
+      ],
+    }
   ],
   history: {
     type: 'hash',

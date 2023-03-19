@@ -61,19 +61,19 @@ function AndroidPart() {
       <CachedRadioGroup
         title={'ABI'}
         allOptions={abiList}
-        localStoreKey={'android-abi'}
+        cachedKey={'android-abi'}
         onOptionChanged={setAbi}
       />
       <CachedRadioGroup
         title={'Build Platform'}
         allOptions={buildPlatformList}
-        localStoreKey={'android-build-platform'}
+        cachedKey={'android-build-platform'}
         onOptionChanged={setBuildPlatform}
       />
       <CachedRadioGroup
         title={'Lib Type'}
         allOptions={libTypeList}
-        localStoreKey={'android-lib-type'}
+        cachedKey={'android-lib-type'}
         onOptionChanged={setLibType}
       />
       <CachedInputNumber
