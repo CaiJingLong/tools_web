@@ -17,10 +17,11 @@
     "@atlaskit/code": "^14.4.8",
     "@umijs/max": "^4.0.59",
     "ahooks": "^3.7.5",
-    "antd": "^5.0.0",
+    "antd": "^4.24.8",
     "copy-to-clipboard": "^3.3.3",
     "crypto-js": "^4.1.1",
-    "js-md5": "^0.7.3"
+    "js-md5": "^0.7.3",
+    "moment": "^2.29.4"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",

@@ -38,8 +38,18 @@ export default defineConfig({
           name: 'converter',
           path: 'converter',
           component: './common/converter',
-        }
+        },
+        {
+          name: 'time',
+          path: 'time',
+          component: './common/time',
+        },
       ],
+    },
+    {
+      name: 'about',
+      path: '/about',
+      component: './about',
     }
   ],
   history: {

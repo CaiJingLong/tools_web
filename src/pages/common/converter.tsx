@@ -66,8 +66,17 @@ function ConvertItem(props: { type: string; text: string }) {
 
   const { encode, decode } = convertMap[type];
 
+  const labelStyle: React.CSSProperties | undefined = {
+    width: '100px',
+  };
   return (
-    <Descriptions title={type} column={1} size="small" bordered>
+    <Descriptions
+      title={type}
+      column={1}
+      size="small"
+      bordered
+      labelStyle={labelStyle}
+    >
       <Descriptions.Item label="encode">
         <DescContent text={encode(text)} />
       </Descriptions.Item>
