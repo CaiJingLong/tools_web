@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@ant-design/icons': ^4.7.0
+  '@ant-design/icons': ^4.8.0
   '@ant-design/pro-components': ^2.0.1
   '@atlaskit/code': ^14.4.8
   '@types/crypto-js': ^4.1.1

@@ -76,7 +76,7 @@ export default function AutoToolIOS() {
 #!/bin/bash
 export XCODE_PATH=${xcodePath};
 export BINS=$XCODE_PATH/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-export ${cc} 
+export ${cc}
 export ${cxx}
 export LD=$BINS/ld
 export AR=$BINS/ar
