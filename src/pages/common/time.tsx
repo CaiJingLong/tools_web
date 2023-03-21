@@ -1,3 +1,4 @@
+import ToolTitle from '@/components/title';
 import { useInterval, useSafeState } from 'ahooks';
 import {
   Checkbox,
@@ -8,8 +9,6 @@ import {
   Typography,
 } from 'antd';
 import moment from 'moment';
-
-const { Title } = Typography;
 
 const { Item } = Descriptions;
 
@@ -41,6 +40,29 @@ function FormattedDates(props: { time: Date }) {
   );
 }
 
+function DiffNow(props: { time: Date }) {
+  const now = moment();
+  const target = moment(props.time);
+  const days = now.diff(target, 'days');
+  const hours = now.diff(target, 'hours') % 24;
+  const minutes = now.diff(target, 'minutes') % 60;
+  const seconds = now.diff(target, 'seconds') % 60;
+
+  return (
+    <Descriptions
+      title="Time Since Target"
+      labelStyle={labelStyle}
+      bordered
+      column={1}
+    >
+      <Descriptions.Item label="Days">{days}</Descriptions.Item>
+      <Descriptions.Item label="Hours">{hours}</Descriptions.Item>
+      <Descriptions.Item label="Minutes">{minutes}</Descriptions.Item>
+      <Descriptions.Item label="Seconds">{seconds}</Descriptions.Item>
+    </Descriptions>
+  );
+}
+
 export default function Time() {
   const [autoTime, setAutoTime] = useSafeState(new Date());
   const [inputTime, setInputTime] = useSafeState<Date | null | undefined>(
@@ -62,7 +84,7 @@ export default function Time() {
 
   return (
     <Space direction="vertical">
-      <Title level={3}>Time</Title>
+      <ToolTitle text="time" />
 
       <Space>
         <Typography.Text>Unit time stamp</Typography.Text>
@@ -124,7 +146,7 @@ export default function Time() {
               marginLeft: '8px',
             }}
           >
-            {autoTime.toISOString()}
+            {autoTime.toLocaleString()}
           </Typography.Text>
         )}
       </Checkbox>
@@ -160,10 +182,11 @@ export default function Time() {
       >
         <Item label="Date">{time.toLocaleDateString()}</Item>
         <Item label="Time">{time.toLocaleTimeString()}</Item>
-        <Item label="Timezone">{time.getTimezoneOffset()}</Item>
       </Descriptions>
 
       <FormattedDates time={time} />
+
+      <DiffNow time={time} />
     </Space>
   );
 }
