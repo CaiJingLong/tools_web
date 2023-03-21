@@ -8,6 +8,7 @@ import { useSafeState } from 'ahooks';
 import { Button, InputNumber, Space, Input } from 'antd';
 import copy from 'copy-to-clipboard';
 import { useEffect } from 'react';
+import styles from './index.less';
 
 const { TextArea } = Input;
 
@@ -30,9 +31,33 @@ function OutputTextArea(props: { title: string; value: string }) {
         title={title}
         style={{
           width: '65vw',
-          height: '80px',
+          height: '96px',
         }}
       />
+    </Space>
+  );
+}
+
+function Random() {
+  const [random, setRandom] = useSafeState('');
+
+  useEffect(() => {
+    setRandom(Math.random().toString(36).slice(2));
+  }, []);
+
+  return (
+    <Space direction="vertical" title="Random" className={styles.box}>
+      <Space>
+        Random: {random}
+        <Button
+          onClick={() => {
+            setRandom(Math.random().toString(36).slice(2));
+          }}
+        >
+          Refresh
+        </Button>
+      </Space>
+      <OutputTextArea title="Random" value={random} />
     </Space>
   );
 }
@@ -58,7 +83,7 @@ function Rsa() {
   }, [bits]);
 
   return (
-    <Space direction="vertical">
+    <Space direction="vertical" title="RSA" className={styles.box}>
       <Space>
         Bits:
         <InputNumber
@@ -78,7 +103,7 @@ function Rsa() {
           </Button>
         ))}
       </Space>
-      <Button onClick={make}>go</Button>
+      <Button onClick={make}>Make</Button>
       <OutputTextArea value={publicKey} title="Public Key" />
       <OutputTextArea value={privateKey} title="Private Key" />
     </Space>
@@ -87,9 +112,10 @@ function Rsa() {
 
 export default function Generator() {
   return (
-    <Space direction="vertical">
+    <Space direction="vertical" size={30}>
       <ToolTitle text={'generator'} />
       <Rsa />
+      <Random />
     </Space>
   );
 }

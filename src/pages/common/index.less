@@ -1,0 +1,15 @@
+.box {
+  position: relative;
+  padding: 10px;
+  border: 1px solid #CCC;
+}
+
+.box:before {
+  content: attr(title);
+  position: absolute;
+  top: -10px;
+  left: -2px;
+  padding: 0 5px;
+  background-color: #f6f7fa;
+  font-weight: bold;
+}
