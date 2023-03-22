@@ -35,12 +35,27 @@ export default defineConfig({
       path: '/common',
       routes: [
         {
-          name: 'converter',
+          name: 'time',
+          path: 'time',
+          component: './common/time',
+        },
+        {
+          name: 'decode/encode',
           path: 'converter',
           component: './common/converter',
-        }
+        },
+        {
+          name: 'generator',
+          path: 'generator',
+          component: './common/generator',
+        },
       ],
-    }
+    },
+    {
+      name: 'about',
+      path: '/about',
+      component: './about',
+    },
   ],
   history: {
     type: 'hash',
