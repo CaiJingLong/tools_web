@@ -13,6 +13,7 @@ import { Button, InputNumber, Space, Input } from 'antd';
 import copy from 'copy-to-clipboard';
 import { useEffect } from 'react';
 import styles from './index.less';
+import { v1, v3, v4, v5, validate as uuid_validate } from 'uuid';
 
 const { TextArea } = Input;
 
@@ -117,6 +118,72 @@ function Random() {
   );
 }
 
+function UUID() {
+  const [output, setOutput] = useSafeState('');
+  const [data, setData] = useSafeState<CachedFormData | null>(null);
+
+  const props: CacheFormItemProps[] = [
+    {
+      title: 'Version',
+      type: 'radioGroup',
+      cachedKey: 'gen-uuid_version',
+      options: ['1', '3', '4', '5'],
+    },
+    {
+      title: 'Namespace',
+      type: 'input',
+      cachedKey: 'gen-uuid_namespace',
+    },
+    {
+      title: 'Name',
+      type: 'input',
+      cachedKey: 'gen-uuid_name',
+    },
+  ];
+
+  function make() {
+    if (!data) return;
+
+    const version = data['gen-uuid_version'] as string;
+    let namespace = (data['gen-uuid_namespace'] as string) ?? '';
+    const name = (data['gen-uuid_name'] as string) ?? '';
+
+    if (!uuid_validate(namespace)) {
+      namespace = v4();
+    }
+
+    let result = '';
+    switch (version) {
+      case '1':
+        result = v1();
+        break;
+      case '3':
+        result = v3(name, namespace).toString();
+        break;
+      case '4':
+        result = v4();
+        break;
+      case '5':
+        result = v5(name, namespace).toString();
+        break;
+    }
+
+    setOutput(result);
+  }
+
+  useEffect(() => {
+    make();
+  }, [data]);
+
+  return (
+    <Space direction="vertical" title="UUID" className={styles.box}>
+      <CachedForm items={props} onDataChanged={setData} />
+      <Button onClick={make}>Generate</Button>
+      <OutputTextArea title="UUID" value={output} />
+    </Space>
+  );
+}
+
 function Rsa() {
   const [bits, setBits] = useSafeState(1024);
   const quickBits = [256, 512, 1024, 2048, 4096];
@@ -171,6 +238,7 @@ export default function Generator() {
       <ToolTitle text={'generator'} />
       <Rsa />
       <Random />
+      <UUID />
     </Space>
   );
 }

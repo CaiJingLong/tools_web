@@ -7,6 +7,7 @@ specifiers:
   '@types/crypto-js': ^4.1.1
   '@types/react': ^18.0.0
   '@types/react-dom': ^18.0.0
+  '@types/uuid': ^9.0.1
   '@umijs/max': ^4.0.59
   ahooks: ^3.7.5
   antd: ^4.24.8
@@ -20,6 +21,7 @@ specifiers:
   prettier-plugin-organize-imports: ^2
   prettier-plugin-packagejson: ^2
   typescript: ^4.1.2
+  uuid: ^9.0.0
 
 dependencies:
   '@ant-design/icons': 4.8.0
@@ -37,12 +39,14 @@ devDependencies:
   '@types/crypto-js': 4.1.1
   '@types/react': 18.0.28
   '@types/react-dom': 18.0.11
+  '@types/uuid': 9.0.1
   husky: 8.0.3
   lint-staged: 13.2.0
   prettier: 2.8.4
   prettier-plugin-organize-imports: 2.3.4_silln3pw57har7jydmecgzoypa
   prettier-plugin-packagejson: 2.4.3_prettier@2.8.4
   typescript: 4.9.5
+  uuid: 9.0.0
 
 packages:
 
@@ -3443,6 +3447,10 @@ packages:
   /@types/use-sync-external-store/0.0.3:
     resolution: {integrity: sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==}
     dev: false
+
+  /@types/uuid/9.0.1:
+    resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
+    dev: true
 
   /@types/yargs-parser/21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
@@ -10934,6 +10942,11 @@ packages:
   /utila/0.4.0:
     resolution: {integrity: sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==}
     dev: false
+
+  /uuid/9.0.0:
+    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
+    hasBin: true
+    dev: true
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}
