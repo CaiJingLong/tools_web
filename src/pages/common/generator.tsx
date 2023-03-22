@@ -1,3 +1,7 @@
+import CachedForm, {
+  CachedFormData,
+  CacheFormItemProps,
+} from '@/components/cached/cached_form';
 import ToolTitle from '@/components/title';
 import {
   exportRSAPrivateKey,
@@ -40,24 +44,75 @@ function OutputTextArea(props: { title: string; value: string }) {
 
 function Random() {
   const [random, setRandom] = useSafeState('');
+  const [configData, setConfigData] = useSafeState<CachedFormData | null>(null);
+
+  async function onChange(data: CachedFormData) {
+    const length = data['gen-random_length'] as number;
+    const type = data['gen-random_type'] as string[];
+    const other = data['gen-random_other'] as string;
+
+    const number = '0123456789';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    let all = '';
+
+    if (type.includes('Number')) {
+      all += number;
+    }
+    if (type.includes('Lowercase')) {
+      all += lower;
+    }
+    if (type.includes('Uppercase')) {
+      all += upper;
+    }
+
+    if (other) all += other;
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += all[Math.floor(Math.random() * all.length)];
+    }
+
+    setRandom(result);
+  }
 
   useEffect(() => {
-    setRandom(Math.random().toString(36).slice(2));
-  }, []);
+    if (configData) onChange(configData);
+  }, [configData]);
+
+  const props: CacheFormItemProps[] = [
+    {
+      title: 'Length',
+      type: 'inputNumber',
+      defaultValue: 16,
+      max: 1024,
+      min: 1,
+      cachedKey: 'gen-random_length',
+    },
+    {
+      title: 'Type',
+      type: 'checkboxGroup',
+      cachedKey: 'gen-random_type',
+      options: ['Number', 'Lowercase', 'Uppercase'],
+    },
+    {
+      title: 'Other characters',
+      type: 'input',
+      cachedKey: 'gen-random_other',
+    },
+  ];
 
   return (
     <Space direction="vertical" title="Random" className={styles.box}>
-      <Space>
-        Random: {random}
-        <Button
-          onClick={() => {
-            setRandom(Math.random().toString(36).slice(2));
-          }}
-        >
-          Refresh
-        </Button>
-      </Space>
-      <OutputTextArea title="Random" value={random} />
+      <CachedForm items={props} onDataChanged={setConfigData} />
+      <Button
+        onClick={() => {
+          if (configData) onChange(configData);
+        }}
+      >
+        Generate
+      </Button>
+      <OutputTextArea title="Random result" value={random} />
     </Space>
   );
 }
