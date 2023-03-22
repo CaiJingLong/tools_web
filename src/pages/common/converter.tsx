@@ -1,4 +1,5 @@
 import { CachedTextArea } from '@/components/cached/cached_input';
+import ToolTitle from '@/components/title';
 import {
   base64Decode,
   base64Encode,
@@ -7,10 +8,10 @@ import {
   sha256Encode,
   sha512Encode,
   urlDecode,
-  urlEncode,
+  urlEncode
 } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
-import { Button, Descriptions, Space, Typography } from 'antd';
+import { Button, Descriptions, Space } from 'antd';
 import copy from 'copy-to-clipboard';
 
 const convertMap: {
@@ -66,8 +67,17 @@ function ConvertItem(props: { type: string; text: string }) {
 
   const { encode, decode } = convertMap[type];
 
+  const labelStyle: React.CSSProperties | undefined = {
+    width: '100px',
+  };
   return (
-    <Descriptions title={type} column={1} size="small" bordered>
+    <Descriptions
+      title={type}
+      column={1}
+      size="small"
+      bordered
+      labelStyle={labelStyle}
+    >
       <Descriptions.Item label="encode">
         <DescContent text={encode(text)} />
       </Descriptions.Item>
@@ -94,7 +104,7 @@ export default function Converter() {
 
   return (
     <Space direction="vertical">
-      <Typography.Title level={3}>Converter</Typography.Title>
+      <ToolTitle text="decode/encode" />
       <CachedTextArea cachedKey={'convert-input'} onValueChanged={setText} />
       {widgets}
     </Space>
