@@ -11,8 +11,10 @@ export interface CacheFormItemProps {
   title: string;
   defaultValue?: string | number | string[];
   options?: string[];
+  // display?: (value: string) => string;
   min?: number;
   max?: number;
+  hidden?: boolean | null | undefined;
 }
 
 export interface CachedFormData {
@@ -28,7 +30,17 @@ function CachedFormItem(props: {
   item: CacheFormItemProps;
   onValueChanged?: (v: string | number | string[]) => void;
 }) {
-  const { type, cachedKey, title, defaultValue, options: values } = props.item;
+  const {
+    type,
+    cachedKey,
+    title,
+    defaultValue,
+    options: values,
+    hidden,
+  } = props.item;
+
+  if (hidden) return null;
+
   const { onValueChanged: propValueChanged } = props;
 
   const onValueChanged = (v: string) => {
