@@ -122,29 +122,36 @@ function UUID() {
   const [output, setOutput] = useSafeState('');
   const [data, setData] = useSafeState<CachedFormData | null>(null);
 
+  const uuidVersionKey = 'gen-uuid_version';
+
+  const hiddenNamespace =
+    data && (data[uuidVersionKey] === 'v4' || data[uuidVersionKey] === 'v1');
+
   const props: CacheFormItemProps[] = [
     {
       title: 'Version',
       type: 'radioGroup',
-      cachedKey: 'gen-uuid_version',
-      options: ['1', '3', '4', '5'],
+      cachedKey: uuidVersionKey,
+      options: ['v1', 'v3', 'v4', 'v5'],
     },
     {
       title: 'Namespace',
       type: 'input',
       cachedKey: 'gen-uuid_namespace',
+      hidden: hiddenNamespace,
     },
     {
       title: 'Name',
       type: 'input',
       cachedKey: 'gen-uuid_name',
+      hidden: hiddenNamespace,
     },
   ];
 
   function make() {
     if (!data) return;
 
-    const version = data['gen-uuid_version'] as string;
+    const version = data[uuidVersionKey] as string;
     let namespace = (data['gen-uuid_namespace'] as string) ?? '';
     const name = (data['gen-uuid_name'] as string) ?? '';
 
@@ -154,16 +161,16 @@ function UUID() {
 
     let result = '';
     switch (version) {
-      case '1':
+      case 'v1':
         result = v1();
         break;
-      case '3':
+      case 'v3':
         result = v3(name, namespace).toString();
         break;
-      case '4':
+      case 'v4':
         result = v4();
         break;
-      case '5':
+      case 'v5':
         result = v5(name, namespace).toString();
         break;
     }
@@ -234,7 +241,7 @@ function Rsa() {
 
 export default function Generator() {
   return (
-    <Space direction="vertical" size={30}>
+    <Space direction="vertical" size={30} className={styles.container}>
       <ToolTitle text={'generator'} />
       <Rsa />
       <Random />

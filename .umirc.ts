@@ -49,6 +49,11 @@ export default defineConfig({
           path: 'generator',
           component: './common/generator',
         },
+        {
+          name: 'qrcode',
+          path: 'qrcode',
+          component: './common/qrcode',
+        },
       ],
     },
     {
