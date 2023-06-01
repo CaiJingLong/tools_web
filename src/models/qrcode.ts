@@ -1,26 +1,36 @@
-import { useLocalStorageState } from 'ahooks';
-
-type QrCodeLevel = 'L' | 'M' | 'Q' | 'H';
+import { useNotnullLocalStorageState } from '@/utils/hooks/notnull_local_storage';
 
 const useQrcode = () => {
-  const [qrcode, setQrcode] = useLocalStorageState<string>('qrcode-value', {
-    defaultValue: '',
-  });
-  const [size, setSize] = useLocalStorageState<number>('qrcode-size', {
-    defaultValue: 128,
-  });
+  const [qrcode, setQrcode] = useNotnullLocalStorageState<string>(
+    'qrcode-value',
+    '',
+  );
+  const [size, setSize] = useNotnullLocalStorageState<number>(
+    'qrcode-size',
+    128,
+  );
 
-  const [fgColor, setFgColor] = useLocalStorageState<string>('qrcode-fgcolor', {
-    defaultValue: '#000000',
-  });
+  const [fgColor, setFgColor] = useNotnullLocalStorageState<string>(
+    'qrcode-fgcolor',
+    '#000000',
+  );
 
-  const [bgColor, setBgColor] = useLocalStorageState<string>('qrcode-bgcolor', {
-    defaultValue: '#ffffff',
-  });
+  const [bgColor, setBgColor] = useNotnullLocalStorageState<string>(
+    'qrcode-bgcolor',
+    '#ffffff',
+  );
 
-  const [level, setLevel] = useLocalStorageState<QrCodeLevel>('qrcode-level', {
-    defaultValue: 'L',
-  });
+  const [level, setLevel] = useNotnullLocalStorageState<string>(
+    'qrcode-level',
+    'L',
+  );
+
+  const [includeMargin, setIncludeMargin] = useNotnullLocalStorageState<boolean>(
+    'qrcode-include-margin',
+    true,
+  );
+
+  console.log(`includeMargin: ${includeMargin}`)
 
   return {
     qrcode,
@@ -33,6 +43,8 @@ const useQrcode = () => {
     setBgColor,
     level,
     setLevel,
+    includeMargin,
+    setIncludeMargin,
   };
 };
 
