@@ -1,7 +1,9 @@
 name: 'github pages'
 on:
   release:
-    types: [published]
+    types: 
+      - created
+      - published
   workflow_dispatch:
 jobs:
   deploy-github-pages: # make sure build/ci work properly
