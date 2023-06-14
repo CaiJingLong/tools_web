@@ -8,7 +8,7 @@ import {
   sha256Encode,
   sha512Encode,
   urlDecode,
-  urlEncode
+  urlEncode,
 } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
 import { Button, Descriptions, Space } from 'antd';
@@ -50,7 +50,18 @@ function DescContent(props: { text: string }) {
 
   return (
     <Space>
-      {text}
+      <pre
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          margin: 0,
+          padding: 0,
+          minWidth: '50vw',
+          overflow: 'auto',
+        }}
+      >
+        {text}
+      </pre>
       <Button
         onClick={() => {
           copy(text);
