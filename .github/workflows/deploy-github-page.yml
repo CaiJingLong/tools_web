@@ -19,8 +19,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 7
-          run_install: false
+          run_install: true
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -37,7 +36,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies with pnpm
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Release gh-pages
         shell: bash
