@@ -57,6 +57,23 @@ export default defineConfig({
       ],
     },
     {
+      name: 'network',
+      path: '/network',
+      routes: [
+        {
+          name: 'http',
+          path: 'http',
+          routes: [
+            {
+              name: 'url',
+              path: 'url',
+              component: './network/http/url',
+            }
+          ],
+        },
+      ],
+    },
+    {
       name: 'about',
       path: '/about',
       component: './about',
