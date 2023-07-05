@@ -2,6 +2,7 @@ import { useNotnullLocalStorageState } from '@/utils/hooks/notnull_local_storage
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Descriptions, Input, Space } from 'antd';
 import copy from 'copy-to-clipboard';
+import { useEffect } from 'react';
 import { default as URLParse, default as Uri } from 'url-parse';
 
 function InfoTable(props: {
@@ -26,6 +27,7 @@ function InfoTable(props: {
               <Space direction="vertical">
                 <Input
                   defaultValue={value}
+                  value={value}
                   onChange={(v) => {
                     onChange?.(key as URLParse.URLPart, v.target.value);
                   }}
@@ -48,8 +50,13 @@ function InfoTable(props: {
 function UrlTable(props: { url: string; onChange?: (url: string) => void }) {
   const { url, onChange } = props;
 
+  // useEffect(() => {
+  //   console.log('url changed: ' + url);
+  // }, [url]);
+
   // convert to uri
   const uri = new Uri(url);
+  // console.log('uri', uri);
 
   const uriParams = new Map<URLParse.URLPart, string>();
 
