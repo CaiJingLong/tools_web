@@ -63,6 +63,7 @@ function UrlTable(props: { url: string; onChange?: (url: string) => void }) {
   uriParams.set('hostname', uri.hostname);
   uriParams.set('port', uri.port);
   uriParams.set('pathname', uri.pathname);
+  uriParams.set('hash', uri.hash);
 
   const queries = new Map<string, string>();
   const rs = Uri.qs.parse(uri.query);
@@ -76,10 +77,14 @@ function UrlTable(props: { url: string; onChange?: (url: string) => void }) {
 
   return (
     <div>
-      <InfoTable data={uriParams} title={'url'} onChange={(key, value) => {
-        uri.set(key, value);
-        onChange?.(uri.toString());
-      }} />
+      <InfoTable
+        data={uriParams}
+        title={'url'}
+        onChange={(key, value) => {
+          uri.set(key, value);
+          onChange?.(uri.toString());
+        }}
+      />
       <InfoTable
         data={queries}
         title={'query'}
@@ -109,10 +114,24 @@ export default function Url() {
     <PageContainer title="url">
       <Space direction="vertical" size={'large'}>
         <h3>
-          Use <a href="https://www.npmjs.com/package/url-parse">url-parse</a> to
-          parse
+          Use{' '}
+          <a
+            href="https://www.npmjs.com/package/url-parse"
+            target="_blank"
+            rel="noreferrer"
+          >
+            url-parse
+          </a>{' '}
+          to parse
         </h3>
-        <Input.TextArea value={url} onChange={(v) => setUrl(v.target.value)} />
+        <Space direction="vertical" style={{ width: '85vw' }}>
+          <Input.TextArea
+            value={url}
+            autoSize={{ minRows: 1, maxRows: 4 }}
+            onChange={(v) => setUrl(v.target.value)}
+          />
+          <Button onClick={() => copy(url)}>Copy url</Button>
+        </Space>
         <UrlTable url={url} onChange={setUrl} />
       </Space>
     </PageContainer>
