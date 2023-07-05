@@ -2,7 +2,6 @@ import { useNotnullLocalStorageState } from '@/utils/hooks/notnull_local_storage
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Descriptions, Input, Space } from 'antd';
 import copy from 'copy-to-clipboard';
-import { useEffect } from 'react';
 import { default as URLParse, default as Uri } from 'url-parse';
 
 function InfoTable(props: {
