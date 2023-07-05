@@ -36,7 +36,7 @@ export function CachedTextArea(props: CachedTextAreaProps) {
   });
 
   useMount(() => {
-    onTextChanged(value);
+    if (value) onTextChanged(value);
   });
 
   console.log('text area', value);
@@ -75,7 +75,7 @@ export function CachedInput(props: CachedInputProps) {
 
   useMount(() => {
     setValue(value);
-    onTextChanged(value);
+    if (value) onTextChanged(value);
   });
 
   return (
@@ -111,7 +111,7 @@ export function CachedInputNumber(props: CachedInputNumberProps) {
 
   useMount(() => {
     setValue(value);
-    onTextChanged(value);
+    if (value) onTextChanged(value);
   });
 
   return (

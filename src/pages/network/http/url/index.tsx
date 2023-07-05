@@ -1,12 +1,15 @@
-import CachedForm, { CachedFormData } from '@/components/cached/cached_form';
+import { useNotnullLocalStorageState } from '@/utils/hooks/notnull_local_storage';
 import { PageContainer } from '@ant-design/pro-components';
-import { useSafeState } from 'ahooks';
-import Uri from 'url-parse';
-import { Button, Descriptions, Space } from 'antd';
+import { Button, Descriptions, Input, Space } from 'antd';
 import copy from 'copy-to-clipboard';
+import { default as URLParse, default as Uri } from 'url-parse';
 
-function Table(props: { data: Map<string, string>; title: string }) {
-  const { data, title } = props;
+function InfoTable(props: {
+  data: Map<string, string>;
+  title: string;
+  onChange?: (key: URLParse.URLPart, value: string) => void;
+}) {
+  const { data, title, onChange } = props;
 
   // use antd Descriptions
 
@@ -21,7 +24,12 @@ function Table(props: { data: Map<string, string>; title: string }) {
           return (
             <Descriptions.Item key={`${title}-${key}`} label={key} span={5}>
               <Space direction="vertical">
-                <span>{value}</span>
+                <Input
+                  defaultValue={value}
+                  onChange={(v) => {
+                    onChange?.(key as URLParse.URLPart, v.target.value);
+                  }}
+                />
                 <Space>
                   <Button onClick={() => copy(key)}>Copy key</Button>
                   <Button onClick={() => copy(value)}>Copy value</Button>
@@ -37,13 +45,13 @@ function Table(props: { data: Map<string, string>; title: string }) {
   );
 }
 
-function UrlTable(props: { url: string }) {
-  const { url } = props;
+function UrlTable(props: { url: string; onChange?: (url: string) => void }) {
+  const { url, onChange } = props;
 
   // convert to uri
   const uri = new Uri(url);
 
-  const uriParams = new Map<string, string>();
+  const uriParams = new Map<URLParse.URLPart, string>();
 
   uriParams.set('href', uri.href);
   uriParams.set('origin', uri.origin);
@@ -68,22 +76,32 @@ function UrlTable(props: { url: string }) {
 
   return (
     <div>
-      <Table data={uriParams} title={'url'} />
-      <Table data={queries} title={'query'} />
+      <InfoTable data={uriParams} title={'url'} onChange={(key, value) => {
+        uri.set(key, value);
+        onChange?.(uri.toString());
+      }} />
+      <InfoTable
+        data={queries}
+        title={'query'}
+        onChange={(key, value) => {
+          queries.set(key, value);
+          const obj: {
+            [key: string]: string;
+          } = {};
+          for (const [key, value] of queries) {
+            obj[key] = value;
+          }
+          uri.set('query', Uri.qs.stringify(obj));
+          // message.info('new uri: ' + uri);
+          onChange?.(uri.toString());
+        }}
+      />
     </div>
   );
 }
 
 export default function Url() {
-  const [data, setData] = useSafeState<CachedFormData>();
-
-  let url: string;
-
-  if (typeof data?.url === 'string') {
-    url = data.url as string;
-  } else {
-    url = '';
-  }
+  const [url, setUrl] = useNotnullLocalStorageState('url-input', '');
 
   // decode url
 
@@ -94,17 +112,8 @@ export default function Url() {
           Use <a href="https://www.npmjs.com/package/url-parse">url-parse</a> to
           parse
         </h3>
-        <CachedForm
-          onDataChanged={setData}
-          items={[
-            {
-              title: 'Input url',
-              type: 'textArea',
-              cachedKey: 'url',
-            },
-          ]}
-        />
-        <UrlTable url={url} />
+        <Input.TextArea value={url} onChange={(v) => setUrl(v.target.value)} />
+        <UrlTable url={url} onChange={setUrl} />
       </Space>
     </PageContainer>
   );
