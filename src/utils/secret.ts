@@ -37,7 +37,6 @@ export async function exportRSAPublicKey(key: CryptoKey): Promise<string> {
 }
 
 export async function exportRSAPrivateKey(key: CryptoKey): Promise<string> {
-    const exported = await window.crypto.subtle.exportKey('pkcs8', key);
-    return Buffer.from(exported).toString('base64');
+  const exported = await window.crypto.subtle.exportKey('pkcs8', key);
+  return Buffer.from(exported).toString('base64');
 }
-    
