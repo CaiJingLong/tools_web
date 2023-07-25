@@ -8,6 +8,7 @@ import {
   Space,
   Typography,
 } from 'antd';
+import dayjs from 'dayjs';
 import moment from 'moment';
 
 const { Item } = Descriptions;
@@ -72,7 +73,7 @@ export default function Time() {
   const [pickOpen, setPickOpen] = useSafeState(false);
 
   const time = inputTime || autoTime;
-  const momentTime = inputTime && moment(inputTime);
+  const momentTime = inputTime && dayjs(inputTime.getTime());
 
   const [playing, setPlaying] = useSafeState(true);
 
@@ -87,10 +88,11 @@ export default function Time() {
       <ToolTitle text="time" />
 
       <Space>
-        <Typography.Text>Unit time stamp</Typography.Text>
+        <Typography.Text>Unix time stamp</Typography.Text>
         <Input
+          title='Unix time stamp (ms)'
           value={inputTime?.getTime()}
-          placeholder="Unit time stamp (ms)"
+          placeholder="Unix time stamp (ms)"
           allowClear
           onChange={(e) => {
             const value = e.target.value;
@@ -103,9 +105,10 @@ export default function Time() {
           }}
         />
         <Input
-          placeholder="Unit time stamp seconds"
+          placeholder="Unix time stamp seconds"
           allowClear
-          value={inputTime?.getTime()}
+          title='Unix time stamp (second)'
+          value={(inputTime?.getTime() ?? 0) / 1000}
           onChange={(e) => {
             const value = e.target.value;
             if (!value.trim()) {
