@@ -1,10 +1,10 @@
 import { CachedTextArea } from '@/components/cached/cached_input';
 import ToolTitle from '@/components/title';
 import {
-  base64Decode,
-  base64Encode,
-  urlDecode,
-  urlEncode,
+  md5Encode,
+  sha1Encode,
+  sha256Encode,
+  sha512Encode,
 } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
 import { Button, Descriptions, Space } from 'antd';
@@ -12,17 +12,23 @@ import copy from 'copy-to-clipboard';
 
 const convertMap: {
   [key: string]: {
-    decode: (str: string) => string;
     encode: (str: string) => string;
   };
 } = {
-  base64: {
-    encode: base64Encode,
-    decode: base64Decode,
+  md5: {
+    encode: md5Encode,
   },
-  url: {
-    encode: urlEncode,
-    decode: urlDecode,
+  sha1: {
+    encode: sha1Encode,
+  },
+  sha256: {
+    encode: sha256Encode,
+  },
+  sha512: {
+    encode: sha512Encode,
+  },
+  sha3: {
+    encode: sha512Encode,
   },
 };
 
@@ -57,7 +63,7 @@ function DescContent(props: { text: string }) {
 function ConvertItem(props: { type: string; text: string }) {
   const { type, text } = props;
 
-  const { encode, decode } = convertMap[type];
+  const { encode } = convertMap[type];
 
   const labelStyle: React.CSSProperties | undefined = {
     width: '100px',
@@ -73,16 +79,11 @@ function ConvertItem(props: { type: string; text: string }) {
       <Descriptions.Item label="encode">
         <DescContent text={encode(text)} />
       </Descriptions.Item>
-      <Descriptions.Item label="decode">
-        <Space>
-          <DescContent text={decode(text)} />
-        </Space>
-      </Descriptions.Item>
     </Descriptions>
   );
 }
 
-export default function Converter() {
+export default function Hash() {
   const keys = Object.keys(convertMap);
 
   const [text, setText] = useSafeState<string>('');
@@ -95,7 +96,7 @@ export default function Converter() {
   return (
     <Space direction="vertical">
       <ToolTitle text="decode/encode" />
-      <CachedTextArea cachedKey={'convert-input'} onValueChanged={setText} />
+      <CachedTextArea cachedKey={'common-hash-input'} onValueChanged={setText} />
       {widgets}
     </Space>
   );

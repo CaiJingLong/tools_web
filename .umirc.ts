@@ -45,6 +45,11 @@ export default defineConfig({
           component: './common/converter',
         },
         {
+          name: 'hash',
+          path: 'hash',
+          component: './common/hash',
+        },
+        {
           name: 'generator',
           path: 'generator',
           component: './common/generator',
