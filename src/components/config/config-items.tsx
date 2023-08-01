@@ -1,4 +1,4 @@
-import { Button, Checkbox, Input, Space, SpaceProps } from 'antd';
+import { Button, Checkbox, Input, Radio, Space, SpaceProps } from 'antd';
 import React from 'react';
 
 const style: React.CSSProperties = {
@@ -56,6 +56,32 @@ export function Check(props: {
 
       {props.checked && props.onCheckedRender}
       {!props.checked && props.onUnCheckedRender}
+    </Space>
+  );
+}
+
+export function RadioGroup(props: {
+  title: string;
+  values: string[];
+  checkedValue?: string;
+  onChange: (v: string) => void;
+  keyPrefix: string;
+}) {
+  return (
+    <Space style={style} direction="vertical">
+      <h3>{props.title}</h3>
+      <Radio.Group
+        value={props.checkedValue}
+        onChange={(e) => {
+          props.onChange(e.target.value);
+        }}
+      >
+        {props.values.map((item) => (
+          <Radio key={`${props.keyPrefix}-${item}`} value={item}>
+            {item}
+          </Radio>
+        ))}
+      </Radio.Group>
     </Space>
   );
 }

@@ -2,11 +2,13 @@ import {
   CheckGroup,
   ConfigInputList,
   ConfigItemContainer,
+  RadioGroup,
 } from '@/components/config/config-items';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { useSafeState } from 'ahooks';
 import { Button, Input, Space, Table } from 'antd';
+import { useEffect } from 'react';
 
 function PkgList() {
   const { pkgList, setPkgList } = useModel('workflow-flutter-add');
@@ -59,6 +61,51 @@ function PkgList() {
   );
 }
 
+function JavaVersion() {
+  const {
+    platforms,
+    javaVersion,
+    setJavaVersion,
+    JavaVersions,
+    JavaDistributions,
+  } = useModel('workflow-flutter-add');
+
+  const [version, setVersion] = useSafeState(javaVersion.version);
+  const [dist, setDist] = useSafeState(javaVersion.distribution);
+
+  useEffect(() => {
+    setJavaVersion({
+      version: version,
+      distribution: dist,
+    });
+  }, [version, dist]);
+
+  const haveAndroid = platforms.includes('android');
+
+  if (!haveAndroid) {
+    return null;
+  }
+
+  return (
+    <ConfigItemContainer title="Java">
+      <RadioGroup
+        title="Java Version"
+        keyPrefix="java-version"
+        values={JavaVersions}
+        checkedValue={version}
+        onChange={(v) => setVersion(v)}
+      />
+      <RadioGroup
+        title="Java Distribution"
+        keyPrefix="java-dist"
+        values={JavaDistributions}
+        checkedValue={dist}
+        onChange={(v) => setDist(v)}
+      />
+    </ConfigItemContainer>
+  );
+}
+
 export default function AddLibraryToNewProject() {
   const {
     // isCurrentProject,
@@ -102,6 +149,7 @@ export default function AddLibraryToNewProject() {
           checkedValues={platforms}
           onChange={setPlatforms}
         />
+        <JavaVersion />
         <ConfigInputList
           title={'Flutter SDK version'}
           values={flutterVersionList}

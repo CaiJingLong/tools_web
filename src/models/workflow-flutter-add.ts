@@ -24,6 +24,37 @@ export interface Pkg {
   path: string;
 }
 
+export interface JavaVersion {
+  version: string;
+  distribution: string;
+}
+
+const JavaVersions = ['8', '11', '17'];
+
+/**
+ * temurin	Eclipse Temurin	Link	Link
+ * zulu	Azul Zulu OpenJDK	Link	Link
+ * adopt or adopt-hotspot	AdoptOpenJDK Hotspot	Link	Link
+ * adopt-openj9	AdoptOpenJDK OpenJ9	Link	Link
+ * liberica	Liberica JDK	Link	Link
+ * microsoft	Microsoft Build of OpenJDK	Link	Link
+ * corretto	Amazon Corretto Build of OpenJDK	Link	Link
+ * semeru	IBM Semeru Runtime Open Edition	Link	Link
+ * oracle	Oracle JDK	Link	Link
+ */
+const JavaDistributions = [
+  'temurin',
+  'zulu',
+  'adopt',
+  'adopt-hotspot',
+  'adopt-openj9',
+  'liberica',
+  'microsoft',
+  'corretto',
+  'semeru',
+  'oracle',
+];
+
 // triggered
 type FlutterTriggered = 'push' | 'pull_request';
 export const FlutterTriggereds: FlutterTriggered[] = ['push', 'pull_request'];
@@ -87,11 +118,17 @@ function makeJob(
   platform: string,
   flutterVersionMatrix: string,
   pkgList: Pkg[],
+  javaVersion: JavaVersion,
 ) {
   const runsOn = getRunsOn(platform);
   const buildCommand = getBuildCommand(platform);
   const newProjectName = 'new_project';
   const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
+  let androidJavaStep = platform === 'android' ? `
+      - uses: actions/setup-java@v2
+        with:
+          distribution: '${javaVersion.distribution}'
+          java-version: '${javaVersion.version}'`:''
   return `  build-on-${platform}:
     name: flutter build on ${platform} with \${{ matrix.flutter-version }}
     runs-on: ${runsOn}
@@ -99,10 +136,12 @@ function makeJob(
       matrix:
         ${flutterVersionMatrix}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3${androidJavaStep}
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: \${{ matrix.flutter-version }}
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=${platform}
@@ -124,11 +163,12 @@ function createGithubWorkflow(
   triggered: string[],
   flutterVersionList: string[],
   pkgList: Pkg[],
+  javaVersion: JavaVersion,
 ): string {
   const flutterVersion = matrixFlutterVersion(flutterVersionList);
 
   const jobs = platforms
-    .map((platform) => makeJob(platform, flutterVersion, pkgList))
+    .map((platform) => makeJob(platform, flutterVersion, pkgList,javaVersion))
     .join('\n');
   return `name: ${ciName}
 
@@ -178,6 +218,13 @@ export default function useWorkflowFlutterAdd() {
       '3.0.5',
     ]);
 
+  // const java version
+  const [javaVersion, setJavaVersion] =
+    useNotnullLocalStorageState<JavaVersion>(`${keyPrefix}-java-version`, {
+      distribution: 'adopt',
+      version: '11',
+    });
+
   const [content, setContent] = useSafeState<string>('');
 
   function refreshGithubWorkflow() {
@@ -187,6 +234,7 @@ export default function useWorkflowFlutterAdd() {
       triggered,
       flutterVersionList,
       pkgList,
+      javaVersion,
     );
     setContent(content);
   }
@@ -218,5 +266,9 @@ export default function useWorkflowFlutterAdd() {
     pkgList,
     setPkgList,
     workflowContent: content,
+    JavaVersions,
+    JavaDistributions,
+    javaVersion,
+    setJavaVersion,
   };
 }
