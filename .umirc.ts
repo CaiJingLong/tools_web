@@ -31,6 +31,17 @@ export default defineConfig({
       ],
     },
     {
+      name: 'Github Actions',
+      path: '/github-actions',
+      routes: [
+        {
+          name: 'Check flutter library add to new project',
+          path: 'check-library-add-to-new-project',
+          component: './github-actions/flutter/check-library-add-to-new-project',
+        },
+      ]
+    },
+    {
       name: 'common',
       path: '/common',
       routes: [
