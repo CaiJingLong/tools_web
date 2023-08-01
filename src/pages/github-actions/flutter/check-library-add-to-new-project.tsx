@@ -1,4 +1,5 @@
 import {
+  Check,
   CheckGroup,
   ConfigInputList,
   ConfigItemContainer,
@@ -120,6 +121,8 @@ export default function AddLibraryToNewProject() {
     FlutterTriggereds,
     flutterVersionList,
     setFlutterVersionList,
+    splitMatrix,
+    setSplitMatrix,
     workflowContent,
   } = useModel('workflow-flutter-add');
 
@@ -155,6 +158,16 @@ export default function AddLibraryToNewProject() {
           values={flutterVersionList}
           onChange={setFlutterVersionList}
         />
+
+        {flutterVersionList.length > 1 && (
+          <Check
+            title="Split matrix (Not support yet)"
+            checked={splitMatrix}
+            onChange={setSplitMatrix}
+            text={'Split matrix'}
+          />
+        )}
+
         <PkgList />
 
         <Input.TextArea value={workflowContent} autoSize />

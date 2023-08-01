@@ -109,7 +109,7 @@ function makeAddPkgs(pkgList: Pkg[]) {
         path += `/${pkg.path}`;
       }
       const json = JSON.stringify({ path });
-      return `flutter pub add '${pkg.name}:${json}'`;
+      return `flutter pub add -- '${pkg.name}:${json}'`;
     })
     .join('\n');
 }
@@ -124,11 +124,14 @@ function makeJob(
   const buildCommand = getBuildCommand(platform);
   const newProjectName = 'new_project';
   const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
-  let androidJavaStep = platform === 'android' ? `
+  let androidJavaStep =
+    platform === 'android'
+      ? `
       - uses: actions/setup-java@v2
         with:
           distribution: '${javaVersion.distribution}'
-          java-version: '${javaVersion.version}'`:''
+          java-version: '${javaVersion.version}'`
+      : '';
   return `  build-on-${platform}:
     name: flutter build on ${platform} with \${{ matrix.flutter-version }}
     runs-on: ${runsOn}
@@ -168,7 +171,7 @@ function createGithubWorkflow(
   const flutterVersion = matrixFlutterVersion(flutterVersionList);
 
   const jobs = platforms
-    .map((platform) => makeJob(platform, flutterVersion, pkgList,javaVersion))
+    .map((platform) => makeJob(platform, flutterVersion, pkgList, javaVersion))
     .join('\n');
   return `name: ${ciName}
 
@@ -194,6 +197,12 @@ export default function useWorkflowFlutterAdd() {
       `${keyPrefix}-is-current-project`,
       true,
     );
+
+  // split matrix
+  const [splitMatrix, setSplitMatrix] = useNotnullLocalStorageState<boolean>(
+    `${keyPrefix}-split-matrix`,
+    true,
+  );
 
   const [platforms, setPlatforms] = useNotnullLocalStorageState<string[]>(
     `${keyPrefix}-platform`,
@@ -263,6 +272,8 @@ export default function useWorkflowFlutterAdd() {
     FlutterTriggereds,
     flutterVersionList,
     setFlutterVersionList,
+    splitMatrix,
+    setSplitMatrix,
     pkgList,
     setPkgList,
     workflowContent: content,

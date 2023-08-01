@@ -1,4 +1,12 @@
-import { Button, Checkbox, Input, Radio, Space, SpaceProps } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Input,
+  Radio,
+  Space,
+  SpaceProps,
+  message,
+} from 'antd';
 import React from 'react';
 
 const style: React.CSSProperties = {
@@ -118,6 +126,10 @@ export function ConfigInputList(props: {
         />
         <Button
           onClick={() => {
+            if (!inputValue) {
+              message.error('Please input value');
+              return;
+            }
             props.onChange([...props.values, inputValue]);
             setInputValue('');
           }}
