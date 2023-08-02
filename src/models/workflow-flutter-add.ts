@@ -112,13 +112,9 @@ function makeAddPkgSteps(
     .map((pkg) => {
       let path: string;
       if (pkg.path === '.') {
-        path = '../';
+        path = '..';
       } else {
         path = '../' + pkg.path;
-      }
-
-      if (path.endsWith('/')) {
-        path = path.substring(0, path.length - 1);
       }
 
       if (isWin) {
@@ -130,6 +126,7 @@ function makeAddPkgSteps(
       - name: Add ${pkg.name} to new project.
         run: flutter pub add -- '${pkg.name}:${json}'
         working-directory: ${newProjectPath}
+        shell: bash
       `;
     })
     .join('\n');
