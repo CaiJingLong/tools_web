@@ -17,6 +17,8 @@ const style: React.CSSProperties = {
   padding: '10px',
 };
 
+export { style as configItemContainerStyle };
+
 export function CheckGroup(props: {
   values: string[];
   checkedValues: string[];
@@ -26,7 +28,21 @@ export function CheckGroup(props: {
 }) {
   return (
     <Space style={style} direction="vertical">
-      <h3>{props.title}</h3>
+      <Space>
+        <h3>{props.title}</h3>
+        <Checkbox
+          checked={props.checkedValues.length === props.values.length}
+          onChange={(e) => {
+            if (e.target.checked) {
+              props.onChange(props.values);
+            } else {
+              props.onChange([]);
+            }
+          }}
+        >
+          All
+        </Checkbox>
+      </Space>
       <Checkbox.Group
         defaultValue={props.checkedValues}
         value={props.checkedValues}
@@ -101,7 +117,7 @@ export function ConfigItemContainer(
 ) {
   const { title, ...rest } = props;
   return (
-    <Space style={style} direction="vertical" {...rest}>
+    <Space style={{ ...style }} direction="vertical" {...rest}>
       <h3>{title}</h3>
       {props.children}
     </Space>
