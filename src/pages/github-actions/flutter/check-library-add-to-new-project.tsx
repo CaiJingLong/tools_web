@@ -1,10 +1,9 @@
 import {
-  Check,
   CheckGroup,
   ConfigInputList,
   ConfigItemContainer,
   RadioGroup,
-  configItemContainerStyle,
+  configItemContainerStyle
 } from '@/components/config/config-items';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
@@ -137,8 +136,6 @@ export default function AddLibraryToNewProject() {
     FlutterTriggereds,
     flutterVersionList,
     setFlutterVersionList,
-    splitMatrix,
-    setSplitMatrix,
     workflowContent,
   } = useModel('workflow-flutter-add');
 
@@ -174,15 +171,6 @@ export default function AddLibraryToNewProject() {
           values={flutterVersionList}
           onChange={setFlutterVersionList}
         />
-
-        {flutterVersionList.length > 1 && (
-          <Check
-            title="Split matrix (Not support yet)"
-            checked={splitMatrix}
-            onChange={setSplitMatrix}
-            text={'Split matrix'}
-          />
-        )}
 
         <PkgList />
 

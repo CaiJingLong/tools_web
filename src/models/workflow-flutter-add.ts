@@ -95,12 +95,6 @@ function getBuildCommand(platform: string) {
   return 'Echo "Unknown platform"';
 }
 
-function matrixFlutterVersion(flutterVersionList: string[]) {
-  return `flutter-version: [${flutterVersionList
-    .map((v) => `'${v}'`)
-    .join(', ')}]`;
-}
-
 function makeAddPkgSteps(
   pkgList: Pkg[],
   newProjectPath: string,
@@ -136,7 +130,7 @@ function makeRequiredStep(platform: string, javaVersion: JavaVersion) {
   let result = '';
   if (platform === 'android') {
     result += `
-      - uses: actions/setup-java@v2
+      - uses: actions/setup-java@v3
         with:
           distribution: '${javaVersion.distribution}'
           java-version: '${javaVersion.version}'`;
@@ -206,63 +200,17 @@ function makeJob(
   flutterVersionList: string[],
   pkgList: Pkg[],
   javaVersion: JavaVersion,
-  splitMatrix: boolean,
 ) {
-  if (splitMatrix) {
-    let result = ``;
-    for (const flutterVersion of flutterVersionList) {
-      result += makeJobWithFlutterVersion(
-        platform,
-        flutterVersion,
-        pkgList,
-        javaVersion,
-      );
-    }
-    return result;
+  let result = ``;
+  for (const flutterVersion of flutterVersionList) {
+    result += makeJobWithFlutterVersion(
+      platform,
+      flutterVersion,
+      pkgList,
+      javaVersion,
+    );
   }
-  const runsOn = getRunsOn(platform);
-  const buildCommand = getBuildCommand(platform);
-  const newProjectName = 'new_project';
-  const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
-  const flutterVersionMatrix = matrixFlutterVersion(flutterVersionList);
-  const jobName = `build-on-${platform}`;
-  const runName = `Build flutter for ${platform} on ${runsOn} with \${{ matrix.flutter-version }}`;
-  const flutterVersion = '${{ matrix.flutter-version }}';
-
-  let androidJavaStep =
-    platform === 'android'
-      ? `
-      - uses: actions/setup-java@v2
-        with:
-          distribution: '${javaVersion.distribution}'
-          java-version: '${javaVersion.version}'`
-      : '';
-
-  return `  ${jobName}:
-    name: ${runName}
-    runs-on: ${runsOn}
-    strategy:
-      matrix:
-        ${flutterVersionMatrix}
-    steps:
-      - uses: actions/checkout@v3
-      ${androidJavaStep}
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${flutterVersion}
-          cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
-      - run: flutter doctor -v
-        name: Flutter info
-      - run: flutter create new_project --platforms=${platform}
-        name: Create new project
-${makeAddPkgSteps(pkgList, newProjectPath, platform)}
-      - run: flutter pub get
-        working-directory: ${newProjectPath}
-      - run: ${buildCommand}
-        working-directory: ${newProjectPath}
-        name: Build example
-`;
+  return result;
 }
 
 function createGithubWorkflow(
@@ -272,7 +220,6 @@ function createGithubWorkflow(
   flutterVersionList: string[],
   srcPkgList: Pkg[],
   javaVersion: JavaVersion,
-  splitMatrix: boolean,
 ): string {
   const pkgList = srcPkgList.filter((pkg) => pkg.checked);
   if (pkgList.length === 0) {
@@ -289,7 +236,7 @@ function createGithubWorkflow(
 
   const jobs = platforms
     .map((platform) =>
-      makeJob(platform, flutterVersionList, pkgList, javaVersion, splitMatrix),
+      makeJob(platform, flutterVersionList, pkgList, javaVersion),
     )
     .join('\n');
   return `name: ${ciName}
@@ -316,12 +263,6 @@ export default function useWorkflowFlutterAdd() {
       `${keyPrefix}-is-current-project`,
       true,
     );
-
-  // split matrix
-  const [splitMatrix, setSplitMatrix] = useNotnullLocalStorageState<boolean>(
-    `${keyPrefix}-split-matrix`,
-    true,
-  );
 
   const [platforms, setPlatforms] = useNotnullLocalStorageState<string[]>(
     `${keyPrefix}-platform`,
@@ -363,7 +304,6 @@ export default function useWorkflowFlutterAdd() {
       flutterVersionList,
       pkgList,
       javaVersion,
-      splitMatrix,
     );
 
     content = content
@@ -383,7 +323,6 @@ export default function useWorkflowFlutterAdd() {
     triggered,
     pkgList,
     flutterVersionList,
-    splitMatrix,
   ]);
 
   return {
@@ -399,8 +338,6 @@ export default function useWorkflowFlutterAdd() {
     FlutterTriggereds,
     flutterVersionList,
     setFlutterVersionList,
-    splitMatrix,
-    setSplitMatrix,
     pkgList,
     setPkgList,
     workflowContent: content,
