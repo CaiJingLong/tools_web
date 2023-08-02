@@ -3,7 +3,7 @@ import {
   ConfigInputList,
   ConfigItemContainer,
   RadioGroup,
-  configItemContainerStyle
+  configItemContainerStyle,
 } from '@/components/config/config-items';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
@@ -145,7 +145,7 @@ export default function AddLibraryToNewProject() {
         <ConfigItemContainer title="CI name">
           <Input
             htmlSize={40}
-            value={ciName}
+            defaultValue={ciName}
             onChange={(e) => {
               setCiName(e.target.value);
             }}

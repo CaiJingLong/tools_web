@@ -99,9 +99,17 @@ function makeAddPkgSteps(
   pkgList: Pkg[],
   newProjectPath: string,
   platform: string,
+  flutterVersion: string,
 ) {
   const isWin = platform === 'windows';
+  console.log('is win: ' + isWin);
 
+  const versionList = flutterVersion.split('.');
+  const majorVersion = parseInt(versionList[0]);
+  const minorVersion = parseInt(versionList[1]);
+
+  const isNewPubAdd =
+    (majorVersion === 3 && minorVersion >= 7) || majorVersion > 3;
   return pkgList
     .map((pkg) => {
       let path: string;
@@ -111,14 +119,21 @@ function makeAddPkgSteps(
         path = '../' + pkg.path;
       }
 
-      if (isWin) {
-        path = path.replaceAll('/', '\\');
+      // if (isWin) {
+      //   path = path.replaceAll('/', '\\');
+      // }
+
+      let addCmd: string;
+      if (isNewPubAdd) {
+        const json = JSON.stringify({ path });
+        addCmd = `flutter pub add -- '${pkg.name}:${json}'`;
+      } else {
+        addCmd = `flutter pub add ${pkg.name} --path ${path}`;
       }
 
-      const json = JSON.stringify({ path });
       return `
       - name: Add ${pkg.name} to new project.
-        run: flutter pub add -- '${pkg.name}:${json}'
+        run: ${addCmd}
         working-directory: ${newProjectPath}
         shell: bash
       `;
@@ -186,7 +201,7 @@ function makeJobWithFlutterVersion(
         name: Flutter info
       - run: flutter create new_project --platforms=${platform}
         name: Create new project
-${makeAddPkgSteps(pkgList, newProjectPath, platform)}
+${makeAddPkgSteps(pkgList, newProjectPath, platform, flutterVersion)}
       - run: flutter pub get
         working-directory: ${newProjectPath}
       - run: ${buildCommand}
