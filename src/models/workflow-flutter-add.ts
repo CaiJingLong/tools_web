@@ -101,27 +101,30 @@ function matrixFlutterVersion(flutterVersionList: string[]) {
     .join(', ')}]`;
 }
 
-function makeAddPkgs(pkgList: Pkg[]) {
-  // flutter pub add 'foo:{"path":"../foo"}'
-  return pkgList
-    .map((pkg) => {
-      let path = '${{ github.workspace }}';
-      if (pkg.path !== '.') {
-        path += `/${pkg.path}`;
-      }
-      const json = JSON.stringify({ path });
-      return `flutter pub add -- '${pkg.name}:${json}'`;
-    })
-    .join('\n');
-}
+function makeAddPkgSteps(
+  pkgList: Pkg[],
+  newProjectPath: string,
+  platform: string,
+) {
+  const isWin = platform === 'windows';
 
-function makeAddPkgSteps(pkgList: Pkg[], newProjectPath: string) {
   return pkgList
     .map((pkg) => {
-      let path = '${{ github.workspace }}';
-      if (pkg.path !== '.') {
-        path += `/${pkg.path}`;
+      let path: string;
+      if (pkg.path === '.') {
+        path = '../';
+      } else {
+        path = '../' + pkg.path;
       }
+
+      if (path.endsWith('/')) {
+        path = path.substring(0, path.length - 1);
+      }
+
+      if (isWin) {
+        path = path.replaceAll('/', '\\');
+      }
+
       const json = JSON.stringify({ path });
       return `
       - name: Add ${pkg.name} to new project.
@@ -132,46 +135,67 @@ function makeAddPkgSteps(pkgList: Pkg[], newProjectPath: string) {
     .join('\n');
 }
 
+function makeRequiredStep(platform: string, javaVersion: JavaVersion) {
+  let result = '';
+  if (platform === 'android') {
+    result += `
+      - uses: actions/setup-java@v2
+        with:
+          distribution: '${javaVersion.distribution}'
+          java-version: '${javaVersion.version}'`;
+  }
+
+  if (platform === 'linux') {
+    result += `
+      - name: Install required packages
+        run: |
+              sudo apt-get update -y
+              sudo apt-get install -y ninja-build libgtk-3-dev
+    `;
+
+    // Enable support for linux
+    result += `
+      - name: Enable support for linux
+        run: flutter config --enable-linux-desktop
+    `;
+  }
+
+  return result;
+}
+
 function makeJobWithFlutterVersion(
   platform: string,
   flutterVersion: string,
   pkgList: Pkg[],
   javaVersion: JavaVersion,
 ) {
-  const jobName = `build-on-${platform}-${flutterVersion}`.replace(/\./g, '-');
+  const jobName = `build-for-${platform}-${flutterVersion}`.replace(/\./g, '-');
   const runsOn = getRunsOn(platform);
 
-  const runName = `Build flutter for ${platform} on ${runsOn} with ${flutterVersion}`;
+  const runName = `Build for ${platform} with ${flutterVersion} on ${runsOn}`;
 
   const buildCommand = getBuildCommand(platform);
   const newProjectName = 'new_project';
   const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
 
-  let androidJavaStep =
-    platform === 'android'
-      ? `
-      - uses: actions/setup-java@v2
-        with:
-          distribution: '${javaVersion.distribution}'
-          java-version: '${javaVersion.version}'`
-      : '';
+  const requiredStep = makeRequiredStep(platform, javaVersion);
 
   return `  ${jobName}:
     name: ${runName}
     runs-on: ${runsOn}
     steps:
       - uses: actions/checkout@v3
-      ${androidJavaStep}
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${flutterVersion}
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      ${requiredStep}
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=${platform}
         name: Create new project
-${makeAddPkgSteps(pkgList, newProjectPath)}
+${makeAddPkgSteps(pkgList, newProjectPath, platform)}
       - run: flutter pub get
         working-directory: ${newProjectPath}
       - run: ${buildCommand}
@@ -235,10 +259,7 @@ function makeJob(
         name: Flutter info
       - run: flutter create new_project --platforms=${platform}
         name: Create new project
-${makeAddPkgSteps(pkgList, newProjectPath)}
-      // - run: ${makeAddPkgs(pkgList)}
-      //   working-directory: ${newProjectPath}
-      //   name: Add package to new project
+${makeAddPkgSteps(pkgList, newProjectPath, platform)}
       - run: flutter pub get
         working-directory: ${newProjectPath}
       - run: ${buildCommand}
