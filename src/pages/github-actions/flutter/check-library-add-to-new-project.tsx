@@ -4,11 +4,12 @@ import {
   ConfigInputList,
   ConfigItemContainer,
   RadioGroup,
+  configItemContainerStyle,
 } from '@/components/config/config-items';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { useSafeState } from 'ahooks';
-import { Button, Input, Space, Table } from 'antd';
+import { Button, Checkbox, Input, Space, Table } from 'antd';
 import { useEffect } from 'react';
 
 function PkgList() {
@@ -18,7 +19,7 @@ function PkgList() {
   const [path, setPath] = useSafeState('.');
 
   return (
-    <ConfigItemContainer title={'Pkg List'}>
+    <ConfigItemContainer title={'Package list'}>
       <Space>
         Name:
         <Input
@@ -36,13 +37,28 @@ function PkgList() {
         />
         <Button
           onClick={() => {
-            setPkgList([...pkgList, { name, path }]);
+            setPkgList([...pkgList, { name, path, checked: true }]);
           }}
         >
           Add
         </Button>
       </Space>
-      <Table dataSource={pkgList}>
+      <Table dataSource={pkgList} pagination={false}>
+        <Table.Column
+          title="Checked"
+          dataIndex="checked"
+          render={(v, _, index) => (
+            <Checkbox
+              defaultChecked={v}
+              value={v}
+              onChange={() => {
+                const newPkgList = [...pkgList];
+                newPkgList[index].checked = !newPkgList[index].checked;
+                setPkgList(newPkgList);
+              }}
+            />
+          )}
+        />
         <Table.Column title="Name" dataIndex="name" />
         <Table.Column title="Version" dataIndex="path" />
         <Table.Column
@@ -170,7 +186,24 @@ export default function AddLibraryToNewProject() {
 
         <PkgList />
 
-        <Input.TextArea value={workflowContent} autoSize />
+        <ConfigItemContainer
+          title="Workflow content"
+          // children填充满
+          style={{
+            ...configItemContainerStyle,
+            width: '60vw',
+            alignItems: 'stretch',
+          }}
+        >
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(workflowContent);
+            }}
+          >
+            Copy
+          </Button>
+          <Input.TextArea value={workflowContent} autoSize />
+        </ConfigItemContainer>
       </Space>
     </PageContainer>
   );

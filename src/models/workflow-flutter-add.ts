@@ -22,6 +22,7 @@ export const FlutterPlatforms: FlutterPlatform[] = [
 export interface Pkg {
   name: string;
   path: string;
+  checked: boolean;
 }
 
 export interface JavaVersion {
@@ -86,7 +87,7 @@ function getBuildCommand(platform: string) {
     case 'linux':
       return 'flutter build linux --release';
     case 'macos':
-      return 'flutter build macos --release --no-codesign';
+      return 'flutter build macos --release';
     case 'windows':
       return 'flutter build windows --release';
   }
@@ -114,16 +115,38 @@ function makeAddPkgs(pkgList: Pkg[]) {
     .join('\n');
 }
 
-function makeJob(
+function makeAddPkgSteps(pkgList: Pkg[], newProjectPath: string) {
+  return pkgList
+    .map((pkg) => {
+      let path = '${{ github.workspace }}';
+      if (pkg.path !== '.') {
+        path += `/${pkg.path}`;
+      }
+      const json = JSON.stringify({ path });
+      return `
+      - name: Add ${pkg.name} to new project.
+        run: flutter pub add -- '${pkg.name}:${json}'
+        working-directory: ${newProjectPath}
+      `;
+    })
+    .join('\n');
+}
+
+function makeJobWithFlutterVersion(
   platform: string,
-  flutterVersionMatrix: string,
+  flutterVersion: string,
   pkgList: Pkg[],
   javaVersion: JavaVersion,
 ) {
+  const jobName = `build-on-${platform}-${flutterVersion}`.replace(/\./g, '-');
   const runsOn = getRunsOn(platform);
+
+  const runName = `Build flutter for ${platform} on ${runsOn} with ${flutterVersion}`;
+
   const buildCommand = getBuildCommand(platform);
   const newProjectName = 'new_project';
   const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
+
   let androidJavaStep =
     platform === 'android'
       ? `
@@ -132,26 +155,90 @@ function makeJob(
           distribution: '${javaVersion.distribution}'
           java-version: '${javaVersion.version}'`
       : '';
-  return `  build-on-${platform}:
-    name: flutter build on ${platform} with \${{ matrix.flutter-version }}
+
+  return `  ${jobName}:
+    name: ${runName}
     runs-on: ${runsOn}
-    strategy:
-      matrix:
-        ${flutterVersionMatrix}
     steps:
-      - uses: actions/checkout@v3${androidJavaStep}
+      - uses: actions/checkout@v3
+      ${androidJavaStep}
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: \${{ matrix.flutter-version }}
+          flutter-version: ${flutterVersion}
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=${platform}
         name: Create new project
-      - run: ${makeAddPkgs(pkgList)}
+${makeAddPkgSteps(pkgList, newProjectPath)}
+      - run: flutter pub get
         working-directory: ${newProjectPath}
-        name: Add package to new project
+      - run: ${buildCommand}
+        working-directory: ${newProjectPath}
+        name: Build example
+`;
+}
+
+function makeJob(
+  platform: string,
+  flutterVersionList: string[],
+  pkgList: Pkg[],
+  javaVersion: JavaVersion,
+  splitMatrix: boolean,
+) {
+  if (splitMatrix) {
+    let result = ``;
+    for (const flutterVersion of flutterVersionList) {
+      result += makeJobWithFlutterVersion(
+        platform,
+        flutterVersion,
+        pkgList,
+        javaVersion,
+      );
+    }
+    return result;
+  }
+  const runsOn = getRunsOn(platform);
+  const buildCommand = getBuildCommand(platform);
+  const newProjectName = 'new_project';
+  const newProjectPath = `\${{ github.workspace }}/${newProjectName}`;
+  const flutterVersionMatrix = matrixFlutterVersion(flutterVersionList);
+  const jobName = `build-on-${platform}`;
+  const runName = `Build flutter for ${platform} on ${runsOn} with \${{ matrix.flutter-version }}`;
+  const flutterVersion = '${{ matrix.flutter-version }}';
+
+  let androidJavaStep =
+    platform === 'android'
+      ? `
+      - uses: actions/setup-java@v2
+        with:
+          distribution: '${javaVersion.distribution}'
+          java-version: '${javaVersion.version}'`
+      : '';
+
+  return `  ${jobName}:
+    name: ${runName}
+    runs-on: ${runsOn}
+    strategy:
+      matrix:
+        ${flutterVersionMatrix}
+    steps:
+      - uses: actions/checkout@v3
+      ${androidJavaStep}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${flutterVersion}
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=${platform}
+        name: Create new project
+${makeAddPkgSteps(pkgList, newProjectPath)}
+      // - run: ${makeAddPkgs(pkgList)}
+      //   working-directory: ${newProjectPath}
+      //   name: Add package to new project
       - run: flutter pub get
         working-directory: ${newProjectPath}
       - run: ${buildCommand}
@@ -165,13 +252,27 @@ function createGithubWorkflow(
   platforms: string[],
   triggered: string[],
   flutterVersionList: string[],
-  pkgList: Pkg[],
+  srcPkgList: Pkg[],
   javaVersion: JavaVersion,
+  splitMatrix: boolean,
 ): string {
-  const flutterVersion = matrixFlutterVersion(flutterVersionList);
+  const pkgList = srcPkgList.filter((pkg) => pkg.checked);
+  if (pkgList.length === 0) {
+    return 'Please add package or checked package to Package list';
+  }
+
+  if (flutterVersionList.length === 0) {
+    return 'Please add flutter version to Flutter version list';
+  }
+
+  if (platforms.length === 0) {
+    return 'Please add platform to Platform list';
+  }
 
   const jobs = platforms
-    .map((platform) => makeJob(platform, flutterVersion, pkgList, javaVersion))
+    .map((platform) =>
+      makeJob(platform, flutterVersionList, pkgList, javaVersion, splitMatrix),
+    )
     .join('\n');
   return `name: ${ciName}
 
@@ -237,14 +338,21 @@ export default function useWorkflowFlutterAdd() {
   const [content, setContent] = useSafeState<string>('');
 
   function refreshGithubWorkflow() {
-    const content = createGithubWorkflow(
+    let content = createGithubWorkflow(
       ciName,
       platforms,
       triggered,
       flutterVersionList,
       pkgList,
       javaVersion,
+      splitMatrix,
     );
+
+    content = content
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .join('\n');
+
     setContent(content);
   }
 
@@ -257,6 +365,7 @@ export default function useWorkflowFlutterAdd() {
     triggered,
     pkgList,
     flutterVersionList,
+    splitMatrix,
   ]);
 
   return {
