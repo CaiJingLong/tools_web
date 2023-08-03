@@ -141,6 +141,47 @@ function makeAddPkgSteps(
     .join('\n');
 }
 
+function makePlatformMinVersionStep(
+  platform: string,
+  minIOSVersion: string,
+  minMacOSVersion: string,
+  newProjectPath: string,
+): string {
+  if (platform === 'macos') {
+    // sed -i '' 's/platform :osx, .*/platform :osx, '\''11.0'\''/g' macos/Podfile
+    const sedCmd1 = `[ -f "macos/Podfile" ] && sed -i '' 's/platform :osx, .*/platform :osx, '\\''${minMacOSVersion}'\\''/g' macos/Podfile`;
+
+    // sed -i '' 's/MACOSX_DEPLOYMENT_TARGET = .*;/MACOSX_DEPLOYMENT_TARGET = 11.0;/g' macos/Runner.xcodeproj/project.pbxproj
+    const sedCmd2 = `[ -f "macos/Runner.xcodeproj/project.pbxproj" ] && sed -i '' 's/MACOSX_DEPLOYMENT_TARGET = .*;/MACOSX_DEPLOYMENT_TARGET = ${minMacOSVersion};/g' macos/Runner.xcodeproj/project.pbxproj`;
+
+    return `
+      - name: Set minimum macOS version
+        run: |
+              ${sedCmd1}
+              ${sedCmd2}
+        working-directory: ${newProjectPath}
+
+    `;
+  }
+  if (platform === 'ios') {
+    // sed -i '' 's/platform :ios, .*/platform :ios, '\''11.0'\''/g' ios/Podfile
+    const sedCmd1 = `[ -f "ios/Podfile" ] && sed -i '' 's/platform :ios, .*/platform :ios, '\\''${minIOSVersion}'\\''/g' ios/Podfile`;;  
+
+    // sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/g' ios/Runner.xcodeproj/project.pbxproj
+    const sedCmd2 = `[ -f "ios/Runner.xcodeproj/project.pbxproj" ] && sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = ${minIOSVersion};/g' ios/Runner.xcodeproj/project.pbxproj`;
+
+    return `
+      - name: Set minimum iOS version
+        run: |
+              ${sedCmd1}
+              ${sedCmd2}
+        working-directory: ${newProjectPath}
+    `;
+  }
+
+  return ``;
+}
+
 function makeRequiredStep(platform: string, javaVersion: JavaVersion) {
   let result = '';
   if (platform === 'android') {
@@ -174,6 +215,8 @@ function makeJobWithFlutterVersion(
   flutterVersion: string,
   pkgList: Pkg[],
   javaVersion: JavaVersion,
+  minIOSVersion: string,
+  minMacOSVersion: string,
 ) {
   const jobName = `build-for-${platform}-${flutterVersion}`.replace(/\./g, '-');
   const runsOn = getRunsOn(platform);
@@ -204,6 +247,7 @@ function makeJobWithFlutterVersion(
 ${makeAddPkgSteps(pkgList, newProjectPath, platform, flutterVersion)}
       - run: flutter pub get
         working-directory: ${newProjectPath}
+${makePlatformMinVersionStep(platform, minIOSVersion, minMacOSVersion,newProjectPath)}
       - run: ${buildCommand}
         working-directory: ${newProjectPath}
         name: Build example
@@ -215,6 +259,8 @@ function makeJob(
   flutterVersionList: string[],
   pkgList: Pkg[],
   javaVersion: JavaVersion,
+  minIOSVersion: string,
+  minMacOSVersion: string,
 ) {
   let result = ``;
   for (const flutterVersion of flutterVersionList) {
@@ -223,6 +269,8 @@ function makeJob(
       flutterVersion,
       pkgList,
       javaVersion,
+      minIOSVersion,
+      minMacOSVersion,
     );
   }
   return result;
@@ -235,6 +283,8 @@ function createGithubWorkflow(
   flutterVersionList: string[],
   srcPkgList: Pkg[],
   javaVersion: JavaVersion,
+  minIOSVersion: string,
+  minMacOSVersion: string,
 ): string {
   const pkgList = srcPkgList.filter((pkg) => pkg.checked);
   if (pkgList.length === 0) {
@@ -251,7 +301,14 @@ function createGithubWorkflow(
 
   const jobs = platforms
     .map((platform) =>
-      makeJob(platform, flutterVersionList, pkgList, javaVersion),
+      makeJob(
+        platform,
+        flutterVersionList,
+        pkgList,
+        javaVersion,
+        minIOSVersion,
+        minMacOSVersion,
+      ),
     )
     .join('\n');
   return `name: ${ciName}
@@ -309,6 +366,19 @@ export default function useWorkflowFlutterAdd() {
       version: '11',
     });
 
+  // const min macOS version
+  const [minMacOSVersion, setMinMacOSVersion] =
+    useNotnullLocalStorageState<string>(
+      `${keyPrefix}-min-macos-version`,
+      '10.15',
+    );
+
+  // const min iOS version
+  const [minIOSVersion, setMinIOSVersion] = useNotnullLocalStorageState<string>(
+    `${keyPrefix}-min-ios-version`,
+    '11.0',
+  );
+
   const [content, setContent] = useSafeState<string>('');
 
   function refreshGithubWorkflow() {
@@ -319,6 +389,8 @@ export default function useWorkflowFlutterAdd() {
       flutterVersionList,
       pkgList,
       javaVersion,
+      minIOSVersion,
+      minMacOSVersion,
     );
 
     content = content
@@ -333,11 +405,13 @@ export default function useWorkflowFlutterAdd() {
     refreshGithubWorkflow();
   }, [
     ciName,
-    isCurrentProject,
     platforms,
     triggered,
-    pkgList,
     flutterVersionList,
+    pkgList,
+    javaVersion,
+    minIOSVersion,
+    minMacOSVersion,
   ]);
 
   return {
@@ -360,5 +434,9 @@ export default function useWorkflowFlutterAdd() {
     JavaDistributions,
     javaVersion,
     setJavaVersion,
+    minMacOSVersion,
+    setMinMacOSVersion,
+    minIOSVersion,
+    setMinIOSVersion,
   };
 }

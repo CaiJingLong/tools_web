@@ -11,6 +11,52 @@ import { useSafeState } from 'ahooks';
 import { Button, Checkbox, Input, Space, Table } from 'antd';
 import { useEffect } from 'react';
 
+function IosVersion() {
+  const { minIOSVersion, setMinIOSVersion, platforms } = useModel(
+    'workflow-flutter-add',
+  );
+
+  const haveIOS = platforms.includes('ios');
+
+  if (!haveIOS) {
+    return null;
+  }
+
+  return (
+    <ConfigItemContainer title="iOS">
+      <Input
+        defaultValue={minIOSVersion}
+        onChange={(e) => {
+          setMinIOSVersion(e.target.value);
+        }}
+      />
+    </ConfigItemContainer>
+  );
+}
+
+function MacOSVersion() {
+  const { minMacOSVersion, setMinMacOSVersion, platforms } = useModel(
+    'workflow-flutter-add',
+  );
+
+  const haveMacOS = platforms.includes('macos');
+
+  if (!haveMacOS) {
+    return null;
+  }
+
+  return (
+    <ConfigItemContainer title="macOS">
+      <Input
+        defaultValue={minMacOSVersion}
+        onChange={(e) => {
+          setMinMacOSVersion(e.target.value);
+        }}
+      />
+    </ConfigItemContainer>
+  );
+}
+
 function PkgList() {
   const { pkgList, setPkgList } = useModel('workflow-flutter-add');
 
@@ -166,6 +212,8 @@ export default function AddLibraryToNewProject() {
           onChange={setPlatforms}
         />
         <JavaVersion />
+        <IosVersion />
+        <MacOSVersion />
         <ConfigInputList
           title={'Flutter SDK version'}
           values={flutterVersionList}
