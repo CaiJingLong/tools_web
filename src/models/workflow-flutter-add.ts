@@ -1,4 +1,5 @@
 import { useNotnullLocalStorageState } from '@/utils/hooks/notnull_local_storage';
+import { formatWorkflow } from '@/utils/strings';
 import { useSafeState } from 'ahooks';
 import { useEffect } from 'react';
 
@@ -165,7 +166,7 @@ function makePlatformMinVersionStep(
   }
   if (platform === 'ios') {
     // sed -i '' 's/platform :ios, .*/platform :ios, '\''11.0'\''/g' ios/Podfile
-    const sedCmd1 = `[ -f "ios/Podfile" ] && sed -i '' 's/platform :ios, .*/platform :ios, '\\''${minIOSVersion}'\\''/g' ios/Podfile`;;  
+    const sedCmd1 = `[ -f "ios/Podfile" ] && sed -i '' 's/platform :ios, .*/platform :ios, '\\''${minIOSVersion}'\\''/g' ios/Podfile`;
 
     // sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/g' ios/Runner.xcodeproj/project.pbxproj
     const sedCmd2 = `[ -f "ios/Runner.xcodeproj/project.pbxproj" ] && sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = ${minIOSVersion};/g' ios/Runner.xcodeproj/project.pbxproj`;
@@ -247,7 +248,12 @@ function makeJobWithFlutterVersion(
 ${makeAddPkgSteps(pkgList, newProjectPath, platform, flutterVersion)}
       - run: flutter pub get
         working-directory: ${newProjectPath}
-${makePlatformMinVersionStep(platform, minIOSVersion, minMacOSVersion,newProjectPath)}
+${makePlatformMinVersionStep(
+  platform,
+  minIOSVersion,
+  minMacOSVersion,
+  newProjectPath,
+)}
       - run: ${buildCommand}
         working-directory: ${newProjectPath}
         name: Build example
@@ -393,12 +399,7 @@ export default function useWorkflowFlutterAdd() {
       minMacOSVersion,
     );
 
-    content = content
-      .split('\n')
-      .filter((line) => line.trim() !== '')
-      .join('\n');
-
-    setContent(content);
+    setContent(formatWorkflow(content));
   }
 
   useEffect(() => {

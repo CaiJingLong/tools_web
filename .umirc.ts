@@ -37,9 +37,15 @@ export default defineConfig({
         {
           name: 'Check flutter library add to new project',
           path: 'check-library-add-to-new-project',
-          component: './github-actions/flutter/check-library-add-to-new-project',
+          component:
+            './github-actions/flutter/check-library-add-to-new-project',
         },
-      ]
+        {
+          name: 'Build flutter example apk for github release',
+          path: 'build-example-apk',
+          component: './github-actions/flutter/build-example-apk',
+        },
+      ],
     },
     {
       name: 'common',
@@ -84,7 +90,7 @@ export default defineConfig({
               name: 'url',
               path: 'url',
               component: './network/http/url',
-            }
+            },
           ],
         },
       ],

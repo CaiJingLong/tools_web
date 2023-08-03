@@ -3,13 +3,13 @@ import {
   ConfigInputList,
   ConfigItemContainer,
   RadioGroup,
-  configItemContainerStyle,
 } from '@/components/config/config-items';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { useSafeState } from 'ahooks';
 import { Button, Checkbox, Input, Space, Table } from 'antd';
 import { useEffect } from 'react';
+import WorkflowResult from '../result';
 
 function IosVersion() {
   const { minIOSVersion, setMinIOSVersion, platforms } = useModel(
@@ -222,24 +222,7 @@ export default function AddLibraryToNewProject() {
 
         <PkgList />
 
-        <ConfigItemContainer
-          title="Workflow content"
-          // children填充满
-          style={{
-            ...configItemContainerStyle,
-            width: '60vw',
-            alignItems: 'stretch',
-          }}
-        >
-          <Button
-            onClick={() => {
-              navigator.clipboard.writeText(workflowContent);
-            }}
-          >
-            Copy
-          </Button>
-          <Input.TextArea value={workflowContent} autoSize />
-        </ConfigItemContainer>
+        <WorkflowResult content={workflowContent} />
       </Space>
     </PageContainer>
   );

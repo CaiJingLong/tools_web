@@ -61,3 +61,23 @@ export function sha512Encode(text: string): string {
 export function sha3Encode(text: string): string {
   return CryptoJS.SHA3(text).toString(CryptoJS.enc.Hex);
 }
+
+export function removeEmptyLines(text: string): string {
+  return text
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .join('\n');
+}
+
+export function formatWorkflow(workflow: string): string {
+  const tmp = removeEmptyLines(workflow);
+  return tmp
+    .split('\n')
+    .map((line, index) => {
+      if (!line.startsWith(' ') && index !== 0) {
+        return '\n' + line;
+      }
+      return line;
+    })
+    .join('\n');
+}
