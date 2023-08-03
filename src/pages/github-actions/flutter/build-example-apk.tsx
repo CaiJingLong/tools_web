@@ -43,7 +43,7 @@ function makeWorkflow(
         working-directory: ${workDir}
       `;
 
-  const releaseVersion = '${{ github.event.release.tag_name }} }}';
+  const releaseVersion = '${{ github.event.release.tag_name }}';
   const uploadApkToRelease = `
       - name: Upload apk to release ${releaseVersion}
         run: |
