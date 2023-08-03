@@ -8,7 +8,7 @@ import { formatWorkflow } from '@/utils/strings';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { useSafeState } from 'ahooks';
-import { Input } from 'antd';
+import { Input, Space } from 'antd';
 import { useEffect } from 'react';
 import WorkflowResult from '../result';
 
@@ -111,43 +111,45 @@ export default function BuildExampleApk() {
 
   return (
     <PageContainer title="Make github workflow for make apk in release">
-      <ConfigItemContainer title="Java">
-        <RadioGroup
-          title="Java Version"
-          keyPrefix="java-version"
-          values={JavaVersions}
-          checkedValue={version}
-          onChange={(v) => setVersion(v)}
-        />
-        <RadioGroup
-          title="Java Distribution"
-          keyPrefix="java-dist"
-          values={JavaDistributions}
-          checkedValue={dist}
-          onChange={(v) => setDist(v)}
-        />
-      </ConfigItemContainer>
+      <Space direction='vertical'>
+        <ConfigItemContainer title="Java">
+          <RadioGroup
+            title="Java Version"
+            keyPrefix="java-version"
+            values={JavaVersions}
+            checkedValue={version}
+            onChange={(v) => setVersion(v)}
+          />
+          <RadioGroup
+            title="Java Distribution"
+            keyPrefix="java-dist"
+            values={JavaDistributions}
+            checkedValue={dist}
+            onChange={(v) => setDist(v)}
+          />
+        </ConfigItemContainer>
 
-      <RadioGroup
-        title={'Mode'}
-        values={modes}
-        onChange={function (v: string): void {
-          setMode(v);
-        }}
-        checkedValue={mode}
-        keyPrefix={`mode`}
-      />
-
-      <ConfigItemContainer title="Example Path">
-        <Input
-          defaultValue={examplePath}
-          onChange={(e) => {
-            setExamplePath(e.target.value);
+        <RadioGroup
+          title={'Mode'}
+          values={modes}
+          onChange={function (v: string): void {
+            setMode(v);
           }}
+          checkedValue={mode}
+          keyPrefix={`mode`}
         />
-      </ConfigItemContainer>
 
-      <WorkflowResult content={workflow} />
+        <ConfigItemContainer title="Example Path">
+          <Input
+            defaultValue={examplePath}
+            onChange={(e) => {
+              setExamplePath(e.target.value);
+            }}
+          />
+        </ConfigItemContainer>
+
+        <WorkflowResult content={workflow} />
+      </Space>
     </PageContainer>
   );
 }
