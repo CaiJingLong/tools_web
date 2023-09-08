@@ -96,6 +96,17 @@ export default defineConfig({
       ],
     },
     {
+      name: 'number',
+      path: '/number',
+      routes: [
+        {
+          name: 'uleb128',
+          path: 'uleb128',
+          component: './number/uleb128',
+        },
+      ],
+    },
+    {
       name: 'about',
       path: '/about',
       component: './about',

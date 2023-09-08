@@ -9,7 +9,7 @@ import {
 } from 'antd';
 import React from 'react';
 
-const style: React.CSSProperties = {
+export const style: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
