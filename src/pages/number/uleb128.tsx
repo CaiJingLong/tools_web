@@ -1,7 +1,14 @@
 import { ItemWrapper } from '@/components/item';
 import { PageContainer } from '@ant-design/pro-components';
 import { useSafeState } from 'ahooks';
-import { Checkbox, Input, Radio, Result, Space } from 'antd';
+import {
+  Checkbox,
+  Descriptions,
+  DescriptionsProps,
+  Input,
+  Radio,
+  Space,
+} from 'antd';
 
 function encodeUleb128(v: string[], radix: number | undefined = 16): string {
   // 转十六进制为数字
@@ -30,8 +37,8 @@ function encodeUleb128(v: string[], radix: number | undefined = 16): string {
   return result.toString();
 }
 
-function encodeSleb128(v: string[]): string {
-  const array = v.map((v) => parseInt(v, 16));
+function encodeSleb128(v: string[], radix: number | undefined = 16): string {
+  const array = v.map((v) => parseInt(v, radix));
 
   let result = array[0];
 
@@ -61,6 +68,49 @@ function encodeSleb128(v: string[]): string {
   }
 
   return result.toString();
+}
+
+function LebResult(props: { n: string }) {
+  const { n } = props;
+
+  const n2 = parseInt(n, 10).toString(2);
+
+  // 每 7 位分割一次，并转为 little endian
+  // 格式示例 bit7 bit6 bit5 bit4 bit3 bit2 bit1 | bit 14 bit13 bit12 bit11 bit10 bit9 bit8
+  const array = [];
+  for (let i = 0; i < n2.length; i += 7) {
+    const v = n2.slice(i, i + 7);
+    array.push(v);
+  }
+
+  const n3 = array.reverse().join(', ');
+
+  const items: DescriptionsProps['items'] = [
+    {
+      label: 'value',
+      span: 3,
+      children: n,
+    },
+    {
+      label: 'binary',
+      span: 3,
+      children: n2,
+    },
+    {
+      label: 'hex',
+      span: 3,
+      children: n3,
+    },
+  ];
+
+  return (
+    // <Result>
+    //   <div>{n}</div>
+    //   <div>{n2}</div>
+    //   <div>{n3}</div>
+    // </Result>
+    <Descriptions title="Result" items={items} />
+  );
 }
 
 function ByInput(props: { sign: boolean }) {
@@ -94,7 +144,7 @@ function ByInput(props: { sign: boolean }) {
           );
         })}
       </Space>
-      <Result title="Result">{result}</Result>
+      <LebResult n={result} />
     </Space>
   );
 }
@@ -134,7 +184,7 @@ function ByPaste(props: { sign: boolean }) {
         />
       </ItemWrapper>
 
-      <Result title="Result">{result}</Result>
+      <LebResult n={result} />
     </Space>
   );
 }
