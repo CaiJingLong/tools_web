@@ -85,6 +85,10 @@ function LebResult(props: { n: string }) {
 
   const n3 = array.reverse().join(', ');
 
+  const n4 = array.map((v) => parseInt(v, 2).toString(16).toUpperCase()).join(', ');
+
+  const n5 = array.map((v) => parseInt(v, 2).toString(16).toUpperCase()).reverse().join(', ');
+
   const items: DescriptionsProps['items'] = [
     {
       label: 'value',
@@ -97,9 +101,19 @@ function LebResult(props: { n: string }) {
       children: n2,
     },
     {
-      label: 'hex',
+      label: 'binary group',
       span: 3,
       children: n3,
+    },
+    {
+      label: 'hex little endian',
+      span: 3,
+      children: n4,
+    },
+    {
+      label: 'hex big endian',
+      span: 3,
+      children: n5,
     },
   ];
 
