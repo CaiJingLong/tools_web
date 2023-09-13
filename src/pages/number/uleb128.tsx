@@ -1,11 +1,11 @@
 import { ItemWrapper } from '@/components/item';
 import { PageContainer } from '@ant-design/pro-components';
 import { useSafeState } from 'ahooks';
-import { Input, Radio, Result, Space } from 'antd';
+import { Checkbox, Input, Radio, Result, Space } from 'antd';
 
-function encodeUleb128(v: string[]): string {
+function encodeUleb128(v: string[], radix: number | undefined = 16): string {
   // 转十六进制为数字
-  const nums = v.map((v) => parseInt(v, 16));
+  const nums = v.map((v) => parseInt(v, radix));
 
   let result = 0;
 
@@ -30,12 +30,47 @@ function encodeUleb128(v: string[]): string {
   return result.toString();
 }
 
-function ByInput() {
+function encodeSleb128(v: string[]): string {
+  const array = v.map((v) => parseInt(v, 16));
+
+  let result = array[0];
+
+  if (result <= 0x7f) {
+    result = (result << 25) >> 25;
+  } else {
+    let cur = array[1];
+    result = (result & 0x7f) | ((cur & 0x7f) << 7);
+    if (cur <= 0x7f) {
+      result = (result << 18) >> 18;
+    } else {
+      cur = array[2];
+      result |= (cur & 0x7f) << 14;
+      if (cur <= 0x7f) {
+        result = (result << 11) >> 11;
+      } else {
+        cur = array[3];
+        result |= (cur & 0x7f) << 21;
+        if (cur <= 0x7f) {
+          result = (result << 4) >> 4;
+        } else {
+          cur = array[4];
+          result |= cur << 28;
+        }
+      }
+    }
+  }
+
+  return result.toString();
+}
+
+function ByInput(props: { sign: boolean }) {
   const length = 4;
   const defaultValue = Array.from({ length }).map(() => '0');
   const [values, setValues] = useSafeState(defaultValue);
 
-  const result = encodeUleb128(values);
+  const method = props.sign ? encodeSleb128 : encodeUleb128;
+
+  const result = method(values);
   return (
     <Space direction="vertical">
       <Space>
@@ -64,8 +99,10 @@ function ByInput() {
   );
 }
 
-function ByPaste() {
+function ByPaste(props: { sign: boolean }) {
   const [text, setText] = useSafeState<string>('98 27 40 55');
+
+  const method = props.sign ? encodeSleb128 : encodeUleb128;
 
   // 转为字符串数组
   let values = text.split(' ');
@@ -83,7 +120,7 @@ function ByPaste() {
     }
   }
 
-  const result = encodeUleb128(newValues);
+  const result = method(newValues);
 
   return (
     <Space direction="vertical">
@@ -105,6 +142,7 @@ function ByPaste() {
 export default function Uleb128Page() {
   const options = ['input', 'paste'];
   const [checked, setChecked] = useSafeState<string>('input');
+  const [signChecked, setSignChecked] = useSafeState<boolean>(false);
 
   return (
     <PageContainer title="Uleb128">
@@ -120,9 +158,12 @@ export default function Uleb128Page() {
             return <Radio key={option} value={option} />;
           })}
         </Radio.Group>
+        <Checkbox onChange={(e) => setSignChecked(e.target.checked)}>
+          signed
+        </Checkbox>
 
-        {checked.includes('input') && <ByInput />}
-        {checked.includes('paste') && <ByPaste />}
+        {checked.includes('input') && <ByInput sign={signChecked} />}
+        {checked.includes('paste') && <ByPaste sign={signChecked} />}
       </Space>
     </PageContainer>
   );
