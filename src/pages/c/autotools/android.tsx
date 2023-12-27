@@ -1,4 +1,11 @@
 import {
+  CachedInput,
+  CachedInputNumber,
+} from '@/components/cached/cached_input';
+import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
+import CodeWidget from '@/components/code_widget';
+import { flags } from '@/configs';
+import {
   abiList,
   buildPlatformList,
   libTypeList,
@@ -6,13 +13,6 @@ import {
 } from '@/utils/autotools';
 import { useSafeState } from 'ahooks';
 import { Button, Modal, Space } from 'antd';
-import { flags } from '@/configs';
-import {
-  CachedInput,
-  CachedInputNumber,
-} from '@/components/cached/cached_input';
-import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
-import CodeWidget from '@/components/code_widget';
 
 function pickFlags() {
   for (const flag of flags.flags) {

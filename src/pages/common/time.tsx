@@ -1,13 +1,18 @@
 import ToolTitle from '@/components/title';
+import { DeleteFilled } from '@ant-design/icons';
+import { useModel } from '@umijs/max';
 import { useInterval, useSafeState } from 'ahooks';
 import {
+  Button,
   Checkbox,
   DatePicker,
   Descriptions,
   Input,
+  Modal,
   Space,
   Typography,
 } from 'antd';
+import dayjs from 'dayjs';
 import moment from 'moment';
 
 const { Item } = Descriptions;
@@ -15,12 +20,39 @@ const { Item } = Descriptions;
 const labelStyle: React.CSSProperties | undefined = {
   width: '16%',
 };
+
+function AddFormatDateWithDialog() {
+  const { dateFormatArray, setDateFormatArray } = useModel('time');
+  const [dialogVisible, setDialogVisible] = useSafeState(false);
+  const [newFormat, setNewFormat] = useSafeState('');
+
+  return (
+    <Space>
+      <Button onClick={() => setDialogVisible(true)}>Add</Button>
+      <Modal
+        closeIcon={null}
+        open={dialogVisible}
+        onCancel={() => setDialogVisible(false)}
+        onOk={() => {
+          setDialogVisible(false);
+          setDateFormatArray([...dateFormatArray, newFormat]);
+        }}
+      >
+        <Input
+          placeholder="Format string"
+          value={newFormat}
+          autoFocus
+          onChange={(e) => setNewFormat(e.target.value)}
+        />
+      </Modal>
+    </Space>
+  );
+}
+
 function FormattedDates(props: { time: Date }) {
-  const dateFormatters = [
-    'yyyy-MM-DD',
-    'YYYY-MM-DD HH:mm:ss',
-    'YYYY-MM-DD HH:mm:ss.SSS',
-  ];
+  const { dateFormatArray, setDateFormatArray } = useModel('time');
+
+  const dateFormatters = dateFormatArray;
   const { time } = props;
   return (
     <Descriptions
@@ -29,13 +61,34 @@ function FormattedDates(props: { time: Date }) {
       column={1}
       title="Formatted date"
     >
-      {dateFormatters.map((item) => {
-        return (
-          <Descriptions.Item label={item} key={`date-format-$(item)`}>
-            {moment(time).format(item)}
-          </Descriptions.Item>
-        );
-      })}
+      {dateFormatters.map((item) => (
+        <Descriptions.Item
+          label={
+            <>
+              {item}{' '}
+              <Button
+                shape="circle"
+                type="text"
+                icon={<DeleteFilled />}
+                onClick={() => {
+                  const newDateFormatArray = dateFormatters.filter(
+                    (i) => i !== item,
+                  );
+                  setDateFormatArray(newDateFormatArray);
+                }}
+              />
+            </>
+          }
+          key={`date-format-$(item)`}
+        >
+          {moment(time).format(item)}
+        </Descriptions.Item>
+
+
+      ))}
+      <Descriptions.Item label={<AddFormatDateWithDialog />}>
+        Add new format date string
+      </Descriptions.Item>
     </Descriptions>
   );
 }
@@ -72,7 +125,7 @@ export default function Time() {
   const [pickOpen, setPickOpen] = useSafeState(false);
 
   const time = inputTime || autoTime;
-  const momentTime = inputTime && moment(inputTime);
+  const momentTime = inputTime && dayjs(inputTime.getTime());
 
   const [playing, setPlaying] = useSafeState(true);
 
@@ -87,10 +140,11 @@ export default function Time() {
       <ToolTitle text="time" />
 
       <Space>
-        <Typography.Text>Unit time stamp</Typography.Text>
+        <Typography.Text>Unix time stamp</Typography.Text>
         <Input
+          title="Unix time stamp (ms)"
           value={inputTime?.getTime()}
-          placeholder="Unit time stamp (ms)"
+          placeholder="Unix time stamp (ms)"
           allowClear
           onChange={(e) => {
             const value = e.target.value;
@@ -103,9 +157,10 @@ export default function Time() {
           }}
         />
         <Input
-          placeholder="Unit time stamp seconds"
+          placeholder="Unix time stamp seconds"
           allowClear
-          value={inputTime?.getTime()}
+          title="Unix time stamp (second)"
+          value={(inputTime?.getTime() ?? 0) / 1000}
           onChange={(e) => {
             const value = e.target.value;
             if (!value.trim()) {

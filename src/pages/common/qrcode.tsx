@@ -26,7 +26,7 @@ export default function QRCodePage() {
   return (
     <Space direction="vertical" style={{ width: 600 }}>
       <Input
-        value={qrcode}
+        defaultValue={qrcode}
         onChange={(v) => {
           setQrcode(v.target.value);
         }}

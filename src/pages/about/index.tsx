@@ -1,4 +1,4 @@
-import { GithubOutlined, GithubFilled } from '@ant-design/icons';
+import { GithubFilled, GithubOutlined } from '@ant-design/icons';
 import { Descriptions, Space, Typography } from 'antd';
 import React from 'react';
 
