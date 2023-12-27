@@ -25,12 +25,10 @@ const useQrcode = () => {
     'L',
   );
 
-  const [includeMargin, setIncludeMargin] = useNotnullLocalStorageState<boolean>(
-    'qrcode-include-margin',
-    true,
-  );
+  const [includeMargin, setIncludeMargin] =
+    useNotnullLocalStorageState<boolean>('qrcode-include-margin', true);
 
-  console.log(`includeMargin: ${includeMargin}`)
+  console.log(`includeMargin: ${includeMargin}`);
 
   return {
     qrcode,

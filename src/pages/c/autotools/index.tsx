@@ -1,9 +1,9 @@
-import React from 'react';
+import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
 import { useSafeState } from 'ahooks';
 import { Space } from 'antd';
+import React from 'react';
 import AndroidPart from './android';
 import AutoToolIOS from './ios';
-import { CachedRadioGroup } from '@/components/cached/cached_radio_picker';
 
 const types = ['android', 'iOS'];
 type AutoToolType = (typeof types)[number];

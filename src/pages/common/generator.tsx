@@ -9,11 +9,11 @@ import {
   generateRSAKeyPair,
 } from '@/utils/secret';
 import { useSafeState } from 'ahooks';
-import { Button, InputNumber, Space, Input } from 'antd';
+import { Button, Input, InputNumber, Space } from 'antd';
 import copy from 'copy-to-clipboard';
 import { useEffect } from 'react';
+import { validate as uuid_validate, v1, v3, v4, v5 } from 'uuid';
 import styles from './index.less';
-import { v1, v3, v4, v5, validate as uuid_validate } from 'uuid';
 
 const { TextArea } = Input;
 
