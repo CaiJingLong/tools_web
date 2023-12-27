@@ -21,6 +21,7 @@
     "copy-to-clipboard": "^3.3.3",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.9",
+    "decimal.js": "^10.4.3",
     "js-md5": "^0.7.3",
     "moment": "^2.29.4",
     "punycode.js": "^2.3.0",

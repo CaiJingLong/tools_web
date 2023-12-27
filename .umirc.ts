@@ -76,6 +76,11 @@ export default defineConfig({
           path: 'qrcode',
           component: './common/qrcode',
         },
+        {
+          name: 'file-size',
+          path: 'file-size',
+          component: './common/file-size',
+        }
       ],
     },
     {
